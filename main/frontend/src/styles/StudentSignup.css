@@ -1,0 +1,15 @@
+/* .card{
+    align-items:center;
+    margin-top:50%;
+}
+.card_div{
+    align-items: center;
+} */
+
+.card{
+    background-color: #313131;
+}
+.container1{
+    background-color: #1a1a1a; 
+    height: 100vh;
+}

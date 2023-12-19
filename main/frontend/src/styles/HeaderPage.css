@@ -1,0 +1,43 @@
+/* Navigation Styles */
+.navbar {
+  background-color: #333; 
+  padding: 10px 0;
+  text-align: center;
+  align-items: center;
+}
+
+.nav-list {
+  list-style-type: none;
+  padding: 0px;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-around;
+  width: 100%;
+}
+
+.nav-item {
+  margin: 0 15px;
+}
+.nav-item:last-child {
+  margin-left: auto;
+}
+.nav-link {
+  text-decoration: none;
+  color: #fff; 
+  font-size: 22px;
+  transition: color 0.3s ease; 
+
+}
+
+.nav-link:visited {
+  color: #fff; 
+}
+
+.nav-link:hover {
+ 
+  color:#007acc;
+}
+
+.right-align {
+  margin-left: 1320px; 
+}

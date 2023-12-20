@@ -12,13 +12,15 @@ import StudentLogin from './pages/StudentLogin';
 import MetaMaskInfo from './metamask/MetaMaskInfo';
 import { MetaMaskProvider } from './context/MetaMaskContext';
 import HeaderPage from './pages/HeaderPage';
-import LoginPage from './pages/LoginPage';
+import { UserProvider } from './context/UserContext';
+import AuthPage from './pages/AuthPage';
 
 function App() {
   return (
     <Router>
       <HeaderPage />
       <MetaMaskProvider>
+      <UserProvider>
         <MetaMaskInfo />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -26,9 +28,10 @@ function App() {
           <Route path="/UniversityPage" element={<UniversityPage />} />
           <Route path="/CompanyPage" element={<CompanyPage />} />
           <Route path="/OwnerPage" element={<OwnerPage />} />
-          <Route path="/LoginPage" element={<LoginPage />} />
+          <Route path="/AuthPage/:type" element={<AuthPage />} />
 
         </Routes>
+        </UserProvider>
       </MetaMaskProvider>
     </Router>
   );

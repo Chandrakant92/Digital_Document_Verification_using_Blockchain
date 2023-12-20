@@ -16,27 +16,32 @@ const HeaderPage = () => {
       
         <li className="nav-item">
           <Link to="/StudentPage" className="nav-link">
-            Student Page
+            Student
           </Link>
         </li> 
          <li className="nav-item">
           <Link to="/UniversityPage" className="nav-link">
-            University Page
+            University
           </Link>
         </li> 
          <li className="nav-item">
           <Link to="/CompanyPage" className="nav-link">
-            Company Page
+            Company
           </Link>
         </li> 
         <li className="nav-item">
           <Link to="/OwnerPage" className="nav-link">
-            Owner Page
+            Owner
           </Link>
         </li>
         <li className="nav-item">
-          <Link to="/LoginPage" className="nav-link">
-           Login Page
+          <Link to="/AuthPage/login" className="nav-link">
+           Login
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/AuthPage/signup" className="nav-link">
+           Signup
           </Link>
         </li>
         

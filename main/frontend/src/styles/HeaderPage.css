@@ -18,7 +18,7 @@
 .nav-item {
   margin: 0 15px;
 }
-.nav-item:last-child {
+.nav-item:nth-last-child(2) {
   margin-left: auto;
 }
 .nav-link {

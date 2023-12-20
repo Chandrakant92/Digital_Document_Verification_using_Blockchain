@@ -2,7 +2,7 @@ import React, { useState, useEffect,useContext } from 'react';
 import { MetaMaskContext } from '../context/MetaMaskContext';
 import axios from 'axios';
 
-//import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 
 import { v4 as uuid } from "uuid";
 // Create a Web3 instance using the current Ethereum provider (MetaMask)
@@ -290,12 +290,12 @@ const handleExcelFileChange = (event) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const data = new Uint8Array(e.target.result);
-    const workbook ="";// XLSX.read(data, { type: 'array' });
+    const workbook = XLSX.read(data, { type: 'array' });
 
     const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
     const worksheet = workbook.Sheets[sheetName];
    
-    const excelData = "";//XLSX.utils.sheet_to_json(worksheet);
+    const excelData = XLSX.utils.sheet_to_json(worksheet);
     setUploadData(excelData);
     console.log("data: ",excelData);
   };

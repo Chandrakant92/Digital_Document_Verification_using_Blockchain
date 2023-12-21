@@ -1,66 +1,92 @@
-// Backend (Node.js) - server.js
-import cors from "cors";
 import express from 'express';
-import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
 
-const app = express();
-app.use(cors());
+const authRouter = express.Router();
 
-const PORT = 5000;
 
-// Replace the connection string with your MongoDB Atlas connection string
-const uri = process.env.DB_URI;
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const studentSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
+  role:String,
   name: String,
   email: String,
   password: String,
-  address: String,
+  roleid: String,
 });
 
-const Student = mongoose.model('Student', studentSchema);
+const User = mongoose.model('User', userSchema);
 
-app.use(bodyParser.json());
 
-app.post('/students', async (req, res) => {
+authRouter.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, address } = req.body;
-    const student = new Student({ name, email, password, address });
-    await student.save();
-    res.status(200).json(student);
-    console.log('data saved in student db:', student);
-  
+    const {role, name, email, password ,roleid} = req.body;
+
+    if (!role|| !name|| !email|| !password ||!roleid|| !password ) {
+      return res.status(400).json({ error: 'fields are required' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+    const user = new User({ role,name, email, password: hashedPassword,roleid });
+    await user.save();
+    res.status(200).json(user);
+    console.log('Data saved in User db:', user);
   } catch (error) {
-    console.error('Error saving student:', error);
+    console.error('Error saving User:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.post('/login', async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      const student = await Student.findOne({ email, password });
-      if (student) {
-        res.status(200).json({ message: 'Login successful' });
-      } else {
-        res.status(401).json({ message: 'Invalid credentials' });
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ error: 'Server error' });
+authRouter.post('/login', async (req, res) => {
+  try {
+    const {role, email, password } = req.body;
+    
+    if (!role||  !email|| !password  ) {
+      return res.status(400).json({ error: 'fields are required' });
     }
-  });
-  
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    const user = await User.findOne({role, email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password); // Compare hashed password
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Create and return JWT token on successful login
+    const token = jwt.sign({ email: user.email, id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(403).json({ message: 'Unauthorized' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token expired or invalid' });
+    }
+    req.user = decoded;
+    next();
+  });
+};
+
+// Protected route example
+authRouter.get('/profile', verifyToken, (req, res) => {
+  res.json({ message: 'Protected route accessed successfully', user: req.user });
+});
+
+export default authRouter;
+

@@ -29,7 +29,7 @@ export const UserProvider = ({ children }) => {
         {
             role: 'owner',
             userData: null,
-            isLoggedIn: false,
+            isLoggedIn: true,
         }
     ]);
 

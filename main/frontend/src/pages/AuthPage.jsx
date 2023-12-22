@@ -32,7 +32,8 @@ const AuthPage = () => {
 
             if (response.status === 200) {
                 if (isLogin) {
-                    login(data.role, userData);
+                    login(data.role, {email:data.email});
+                    localStorage.setItem(data.role, JSON.stringify({email:data.email,check:true}));
                 }
                 alert(response.data.message);
                 navigate(!isLogin ? '/AuthPage/login' : data.role === 'student' ? '/StudentPage' : data.role === 'university' ? '/UniversityPage' : '/CompanyPage');
@@ -90,21 +91,17 @@ const AuthPage = () => {
 
     return (
 
-        <div className="flex justify-center h-screen">
-            <div className="relative w-1/2  flex flex-col items-center  ">
-                <div className="hidden md:block absolute left-0 top-1/3 transform -translate-y-1/2">
+        <div className="mt-10 h-80 flex justify-center   ">
+            <div className=" w-1/2   flex  justify-evenly  ">
+                <div className="hidden md:block   self-center  ">
                     <IconButton onClick={handlePrev} disabled={isFirstStep} className="rounded-full" >
                         <ChevronLeftIcon className="h-6 w-6 text-white" />
                     </IconButton>
                 </div>
-                <div className="hidden md:block absolute right-0 top-1/3 transform -translate-y-1/2">
-                    <IconButton onClick={handleNext} disabled={isLastStep || !selectedRole} className="rounded-full" >
-                        <ChevronRightIcon className="h-6 w-6 text-white" />
-                    </IconButton>
-                </div>
 
-                <div className="mt-10 w-96 pl-10 pr-10">
-                    <Stepper
+                <div className="w-96   flex flex-col  space-y-10">
+                    <div className=' '>
+                    <Stepper 
                         activeStep={activeStep}
                         isLastStep={(value) => setIsLastStep(value)}
                         isFirstStep={(value) => setIsFirstStep(value)}
@@ -112,7 +109,7 @@ const AuthPage = () => {
                         <Step onClick={() => setActiveStep(0)}>1</Step>
                         <Step onClick={() => selectedRole && setActiveStep(1)}>2</Step>
                     </Stepper>
-
+                     </div>
 
 
                     <form onSubmit={handleSubmit(onSubmit)}>
@@ -126,7 +123,7 @@ const AuthPage = () => {
                                     animate="visible"
                                     exit="exit"
                                 >
-                                    <div className="mt-20 items-center">
+                                    <div className=" ">
                                         <Controller
                                             name="role"
                                             control={control}
@@ -152,7 +149,7 @@ const AuthPage = () => {
                                     animate="visible"
                                     exit="exit"
                                 >
-                                    <div className="mt-20 flex flex-col space-y-4">
+                                    <div className="flex flex-col space-y-4">
                                         {updatedFilteredFields.map((field, index) => (
                                             <Input
                                                 key={index}
@@ -171,10 +168,14 @@ const AuthPage = () => {
                         </AnimatePresence>
 
                     </form>
+                    </div>
 
-
-
+                <div className="hidden md:block self-center    ">
+                    <IconButton onClick={handleNext} disabled={isLastStep || !selectedRole} className="rounded-full" >
+                        <ChevronRightIcon className="h-6 w-6 text-white" />
+                    </IconButton>
                 </div>
+
             </div>
 
 

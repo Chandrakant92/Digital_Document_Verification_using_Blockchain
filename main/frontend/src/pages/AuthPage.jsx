@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
+import axios from 'axios';
 
 const AuthPage = () => {
 
@@ -16,19 +17,33 @@ const AuthPage = () => {
 
     const [isLogin, setLogin] = useState(false);
 
-    const { users, login, logout } = useUserContext();
+    const { login, logout } = useUserContext();
 
+    const onSubmit = async (data) => {
+        const userData = isLogin
+            ? { role: data.role, email: data.email, password: data.password }
+            : { role: data.role, name: data.name, email: data.email, password: data.password, roleid: data.roleid };
 
-    const onSubmit = (data) => {
-        if (isLogin) {
-            console.log(data);
-            const userData = { email: data.email, password: data.password };
-            login(data.role, userData);
+        const apiEndpoint = isLogin ? 'login' : 'signup';
+        console.log(isLogin ? 'login:' : 'signup:', data.role, userData);
 
-        }else{
-            //signup//
+        try {
+            const response = await axios.post(`http://localhost:5000/auth/${apiEndpoint}`, userData);
+
+            if (response.status === 200) {
+                if (isLogin) {
+                    login(data.role, userData);
+                }
+                alert(response.data.message);
+                navigate(!isLogin ? '/AuthPage/login' : data.role === 'student' ? '/StudentPage' : data.role === 'university' ? '/UniversityPage' : '/CompanyPage');
+            }
+            console.log(response.data.message);
+        } catch (error) {
+            console.error(`Error ${isLogin ? 'Login' : 'Creating Account'}:`, error.response.data.message);
+            alert(error.response.data.message);
         }
     };
+
     const handleLogout = (role) => {
         logout(role);
     };
@@ -56,19 +71,14 @@ const AuthPage = () => {
         { name: 'name', label: 'Username', type: 'text', required: true },
         { name: 'email', label: 'Email', type: 'email', required: true },
         { name: 'password', label: 'Password', type: 'password', required: true },
-        { name: 'address', label: 'Wallet Address', type: 'text', required: false },
-        { name: 'cid', label: 'Company Id', type: 'text', required: true },
-        { name: 'uid', label: 'University Id', type: 'text', required: true },
+        { name: 'roleid', label: selectedRole === 'student' ? 'Student Id' : selectedRole === 'company' ? 'Company CIN' : 'University URN', type: 'text', required: true, },
     ];
 
 
     const updatedFilteredFields =
         isLogin
             ? inputFields.filter(field => field.name === 'email' || field.name === 'password')
-            : inputFields.filter(
-                field => (field.name !== 'cid' && field.name !== 'uid') || (field.name === 'cid' && selectedRole === 'company') || (field.name === 'uid' && selectedRole === 'university')
-            );
-
+            : inputFields;
     const [activeStep, setActiveStep] = useState(0);
 
     const [isLastStep, setIsLastStep] = React.useState(false);
@@ -166,28 +176,8 @@ const AuthPage = () => {
 
                 </div>
             </div>
-            {/* <input
-    type="file"
-    className="block w-full text-sm text-slate-500
-        file:mr-4 file:py-2 file:px-4 file:rounded-md
-        file:border-0 file:text-sm file:font-semibold
-        file:bg-gray-500 file:text-white
-        hover:file:bg-gray-900"
-  /> */}
-            {/* <div>
-                {users.map((user,index) => (
-                    <div key={index}>
-                        {user.isLoggedIn ? (
-                            <div>
-                                <p>email, {user.userData.email}, password: {user.userData.password} ({user.role})</p>
-                                <button onClick={() => handleLogout(user.role)}>Logout</button>
-                            </div>
-                        ) : (
-                            <button onClick={() => handleLogin(user.role)}>Login as {user.role}</button>
-                        )}
-                    </div>
-                ))}
-            </div> */}
+
+
         </div>
 
 

@@ -25,14 +25,15 @@ const User = mongoose.model('User', userSchema);
 authRouter.post('/signup', async (req, res) => {
   try {
     const {role, name, email, password ,roleid} = req.body;
-
-    if (!role|| !name|| !email|| !password ||!roleid|| !password ) {
+    console.log("data: ",req.body);
+    if (!role|| !name|| !email|| !password ||!roleid) {
       return res.status(400).json({ error: 'fields are required' });
     }
     const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
     const user = new User({ role,name, email, password: hashedPassword,roleid });
     await user.save();
-    res.status(200).json(user);
+    
+    res.status(200).json({message:'Account Created Successfully'});
     console.log('Data saved in User db:', user);
   } catch (error) {
     console.error('Error saving User:', error);
@@ -49,7 +50,7 @@ authRouter.post('/login', async (req, res) => {
     }
     const user = await User.findOne({role, email });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid Email' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password); // Compare hashed password
@@ -59,7 +60,7 @@ authRouter.post('/login', async (req, res) => {
 
     // Create and return JWT token on successful login
     const token = jwt.sign({ email: user.email, id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ token });
+    res.status(200).json({ message:"Login Successful" });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Server error' });

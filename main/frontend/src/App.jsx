@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate, Navigate } from 'react-router-dom';
 
 // Import your page components
 import HomePage from './pages/HomePage';
@@ -12,26 +12,47 @@ import StudentLogin from './pages/StudentLogin';
 import MetaMaskInfo from './metamask/MetaMaskInfo';
 import { MetaMaskProvider } from './context/MetaMaskContext';
 import HeaderPage from './pages/HeaderPage';
-import { UserProvider } from './context/UserContext';
+import { useUserContext } from './context/UserContext';
 import AuthPage from './pages/AuthPage';
 
 function App() {
+
+  const { users } = useUserContext();
+  
+  const isLoggedIn = (role) => {
+    const currentUser = users.find(user => user.role === role);
+    return currentUser ? currentUser.isLoggedIn : false;
+  };
+
+  const RedirectToLogin = () => <Navigate to="/AuthPage/login" />;
+
+
   return (
     <Router>
       <HeaderPage />
       <MetaMaskProvider>
-      <UserProvider>
-        <MetaMaskInfo />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/StudentPage" element={<StudentPage />} />
-          <Route path="/UniversityPage" element={<UniversityPage />} />
-          <Route path="/CompanyPage" element={<CompanyPage />} />
-          <Route path="/OwnerPage" element={<OwnerPage />} />
-          <Route path="/AuthPage/:type" element={<AuthPage />} />
+          <MetaMaskInfo />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/StudentPage"
+              element={isLoggedIn('student') ? <StudentPage /> : <RedirectToLogin />}
+            />
+            <Route
+              path="/UniversityPage"
+              element={isLoggedIn('university') ? <UniversityPage /> : <RedirectToLogin />}
+            />
+            <Route
+              path="/CompanyPage"
+              element={isLoggedIn('company') ? <CompanyPage /> : <RedirectToLogin />}
+            />
+            <Route
+              path="/OwnerPage"
+              element= {<OwnerPage />} 
+            />
+            <Route path="/AuthPage/:type" element={<AuthPage />} />
 
-        </Routes>
-        </UserProvider>
+          </Routes>
       </MetaMaskProvider>
     </Router>
   );

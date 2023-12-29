@@ -13,9 +13,14 @@ const mongoConnect = async () => {
     });
     console.log('Connected to MongoDB');
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
+    if (error.code === "ECONNREFUSED") {
+      console.error("Mongo server is not running or accessible");
+      // Handle connection refusal error here
+  } else {
+    console.error('Error connecting to MongoDB',error);
  //   process.exit(1); // Exit the process if unable to connect
   }
+}
 };
 
 export { mongoConnect };

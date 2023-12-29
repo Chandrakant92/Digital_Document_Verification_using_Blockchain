@@ -1,7 +1,6 @@
 // Navbar.js
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useResolvedPath } from 'react-router-dom';
-import '../styles/HeaderPage.css'; // Import the CSS file for styling
 import { useUserContext } from '../context/UserContext';
 import {
   Navbar,
@@ -74,8 +73,8 @@ const HeaderPage = () => {
 
   const handleLogout = () => {
     //  console.log("l: ",role);
-    localStorage.setItem(role, JSON.stringify({email:"",check:false}));
-              
+   // localStorage.setItem(role, JSON.stringify({email:"",check:false}));
+   localStorage.removeItem(role);         
     logout(role);
   };
 

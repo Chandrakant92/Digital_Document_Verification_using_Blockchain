@@ -6,23 +6,24 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
+import { useMetaMaskContext } from '../context/MetaMaskContext';
 
 const AuthPage = () => {
 
     const { type } = useParams();
-
+    const { account } = useMetaMaskContext();
     const navigate = useNavigate();
-    const { control, register, handleSubmit, formState: { errors }, watch } = useForm();
+    const { control, setValue,register, handleSubmit, formState: { errors }, watch } = useForm();
     const selectedRole = watch('role');
 
     const [isLogin, setLogin] = useState(false);
 
-    const { login, logout } = useUserContext();
+    const { login } = useUserContext();
 
     const onSubmit = async (data) => {
         const userData = isLogin
-            ? { role: data.role, email: data.email, password: data.password }
-            : { role: data.role, name: data.name, email: data.email, password: data.password, roleid: data.roleid };
+            ? { role: data.role, email: data.email, password: data.password, address: data.address }
+            : { role: data.role, name: data.name, email: data.email, password: data.password, roleid: data.roleid, address: data.address };
 
         const apiEndpoint = isLogin ? 'login' : 'signup';
         console.log(isLogin ? 'login:' : 'signup:', data.role, userData);
@@ -32,8 +33,8 @@ const AuthPage = () => {
 
             if (response.status === 200) {
                 if (isLogin) {
-                    login(data.role, {email:data.email});
-                    localStorage.setItem(data.role, JSON.stringify({email:data.email,check:true}));
+                    await login(data.role, { email: data.email, address: data.address });
+                    localStorage.setItem(data.role, JSON.stringify({ email: data.email, address: data.address }));
                 }
                 alert(response.data.message);
                 navigate(!isLogin ? '/AuthPage/login' : data.role === 'student' ? '/StudentPage' : data.role === 'university' ? '/UniversityPage' : '/CompanyPage');
@@ -44,10 +45,10 @@ const AuthPage = () => {
             alert(error.response.data.message);
         }
     };
-
-    const handleLogout = (role) => {
-        logout(role);
-    };
+    
+   useEffect(()=>{
+    setValue('address', account);
+   },[account])
 
     useEffect(() => {
         if (type === "login") {
@@ -73,12 +74,14 @@ const AuthPage = () => {
         { name: 'email', label: 'Email', type: 'email', required: true },
         { name: 'password', label: 'Password', type: 'password', required: true },
         { name: 'roleid', label: selectedRole === 'student' ? 'Student Id' : selectedRole === 'company' ? 'Company CIN' : 'University URN', type: 'text', required: true, },
+        { name: 'address', label: 'Wallet Address', type: 'text', required: false },
+
     ];
 
 
     const updatedFilteredFields =
         isLogin
-            ? inputFields.filter(field => field.name === 'email' || field.name === 'password')
+            ? inputFields.filter(field => field.name === 'email' || field.name === 'password' || field.name === 'address')
             : inputFields;
     const [activeStep, setActiveStep] = useState(0);
 
@@ -101,15 +104,15 @@ const AuthPage = () => {
 
                 <div className="w-96   flex flex-col  space-y-10">
                     <div className=' '>
-                    <Stepper 
-                        activeStep={activeStep}
-                        isLastStep={(value) => setIsLastStep(value)}
-                        isFirstStep={(value) => setIsFirstStep(value)}
-                    >
-                        <Step onClick={() => setActiveStep(0)}>1</Step>
-                        <Step onClick={() => selectedRole && setActiveStep(1)}>2</Step>
-                    </Stepper>
-                     </div>
+                        <Stepper
+                            activeStep={activeStep}
+                            isLastStep={(value) => setIsLastStep(value)}
+                            isFirstStep={(value) => setIsFirstStep(value)}
+                        >
+                            <Step onClick={() => setActiveStep(0)}>1</Step>
+                            <Step onClick={() => selectedRole && setActiveStep(1)}>2</Step>
+                        </Stepper>
+                    </div>
 
 
                     <form onSubmit={handleSubmit(onSubmit)}>
@@ -156,6 +159,9 @@ const AuthPage = () => {
                                                 label={field.label}
                                                 type={field.type}
                                                 {...register(field.name, { required: field.required })}
+
+                                                {...(field.name === 'address' ? {  readOnly: true, style: { backgroundColor: 'lightgray' } } : {})}
+
                                             />
                                         ))}
 
@@ -168,7 +174,7 @@ const AuthPage = () => {
                         </AnimatePresence>
 
                     </form>
-                    </div>
+                </div>
 
                 <div className="hidden md:block self-center    ">
                     <IconButton onClick={handleNext} disabled={isLastStep || !selectedRole} className="rounded-full" >

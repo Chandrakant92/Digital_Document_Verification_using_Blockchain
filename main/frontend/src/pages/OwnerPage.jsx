@@ -1,11 +1,10 @@
 import React, { useState, useEffect,useContext } from 'react';
-import { MetaMaskContext } from '../context/MetaMaskContext';
+import { useMetaMaskContext } from '../context/MetaMaskContext';
 import axios from 'axios';
 
 // Create a Web3 instance using the current Ethereum provider (MetaMask)
 function OwnerPage() {
-  const { contract, account } = useContext(MetaMaskContext);
-
+  const { contract, account } = useMetaMaskContext();
   const [companyAddresses, setCompanyAddresses] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(''); // State for selected company address
   

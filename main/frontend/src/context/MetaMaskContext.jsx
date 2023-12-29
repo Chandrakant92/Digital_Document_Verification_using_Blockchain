@@ -1,6 +1,12 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState,useContext } from 'react';
 
 export const MetaMaskContext = createContext();
+
+// Custom hook to use the context
+export const useMetaMaskContext = () => {
+  return useContext(MetaMaskContext);
+};
+
 
 export const MetaMaskProvider = ({ children }) => {
   const [contract, setContract] = useState(null);

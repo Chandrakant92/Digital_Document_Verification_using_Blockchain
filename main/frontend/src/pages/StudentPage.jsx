@@ -1,8 +1,7 @@
 import React, { useState, useEffect,useContext } from 'react';
-import { MetaMaskContext } from '../context/MetaMaskContext';
+import { useMetaMaskContext } from '../context/MetaMaskContext';
 import axios from 'axios';
 
-// Create a Web3 instance using the current Ethereum provider (MetaMask)
 function StudentPage() {
   const [file, setFile] = useState(null);
   const [cid, setCid] = useState(null);
@@ -10,7 +9,7 @@ function StudentPage() {
   const [uuid, setUUID] = useState(null);
 
 
-  const { contract, account } = useContext(MetaMaskContext);
+  const { contract, account } = useMetaMaskContext();
 
   
 
@@ -92,7 +91,7 @@ async function uploadDocument(uniqueId,ipfsHash, universityAddress) {
   const fetchUniversityAddresses = async () => {
     try {
      const transaction = await contract.getAllUniversityAddresses({ from: account });
-
+    
      console.log('Response from getuniversity:', transaction); // Log the response
      const uniqueAddressesSet = new Set(transaction);
      // Convert the Set back to an array.
@@ -102,6 +101,8 @@ async function uploadDocument(uniqueId,ipfsHash, universityAddress) {
       console.error('Error fetching university addresses:', error.reason);
     }
   };
+
+
 
   useEffect(() => {
     // Check if contract is not null

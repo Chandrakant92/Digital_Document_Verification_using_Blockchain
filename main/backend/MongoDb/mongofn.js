@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   roleid: String,
+  address:String,
 });
 
 const User = mongoose.model('User', userSchema);
@@ -24,13 +25,13 @@ const User = mongoose.model('User', userSchema);
 
 authRouter.post('/signup', async (req, res) => {
   try {
-    const {role, name, email, password ,roleid} = req.body;
-    console.log("data: ",req.body);
-    if (!role|| !name|| !email|| !password ||!roleid) {
+    const {role, name, email, password ,roleid,address} = req.body;
+  
+    if (!role|| !name|| !email|| !password ||!roleid||!address) {
       return res.status(400).json({ error: 'fields are required' });
     }
     const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-    const user = new User({ role,name, email, password: hashedPassword,roleid });
+    const user = new User({ role,name, email, password: hashedPassword,roleid,address });
     await user.save();
     
     res.status(200).json({message:'Account Created Successfully'});
@@ -43,14 +44,14 @@ authRouter.post('/signup', async (req, res) => {
 
 authRouter.post('/login', async (req, res) => {
   try {
-    const {role, email, password } = req.body;
+    const {role, email, password,address } = req.body;
     
-    if (!role||  !email|| !password  ) {
+    if (!role||  !email|| !password ||!address ) {
       return res.status(400).json({ error: 'fields are required' });
     }
-    const user = await User.findOne({role, email });
+    const user = await User.findOne({role, email,address });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid Email' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password); // Compare hashed password

@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useContext } from 'react';
-import { MetaMaskContext } from '../context/MetaMaskContext';
+import { useMetaMaskContext } from '../context/MetaMaskContext';
 import axios from 'axios';
 
 import * as XLSX from 'xlsx';
@@ -13,7 +13,7 @@ function UniversityPage() {
   
   const [pdfUrl, setPdfUrl] = useState(null);
 
-  const { contract, account } = useContext(MetaMaskContext);
+  const { contract, account } = useMetaMaskContext();
 
   const [companyAddresses, setCompanyAddresses] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(''); // State for selected company address

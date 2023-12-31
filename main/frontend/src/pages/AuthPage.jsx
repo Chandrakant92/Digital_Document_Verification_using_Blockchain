@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Stepper, Step, Button, Select, Input, Option, IconButton } from "@material-tailwind/react";
+import { Button, Select, Input, Option } from "@material-tailwind/react";
 import { useForm, Controller } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
@@ -7,18 +7,43 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 import { useMetaMaskContext } from '../context/MetaMaskContext';
+import {
+    Box,
+    Flex,
+    Icon,
+    IconButton,
+    Stack,
+    Step,
+    StepDescription,
+    StepIcon,
+    StepIndicator,
+    StepNumber,
+    StepSeparator,
+    StepStatus,
+    StepTitle,
+    Stepper,
+    useColorModeValue,
+    useSteps,
+} from '@chakra-ui/react'
+import Card from '../components/card/Card';
+import IconBox from '../components/icons/IconBox';
 
 const AuthPage = () => {
 
     const { type } = useParams();
     const { account } = useMetaMaskContext();
     const navigate = useNavigate();
-    const { control, setValue,register, handleSubmit, formState: { errors }, watch } = useForm();
+    const { control, setValue, register, handleSubmit, formState: { errors }, watch } = useForm();
     const selectedRole = watch('role');
 
     const [isLogin, setLogin] = useState(false);
 
     const { login } = useUserContext();
+
+    const cardbg = useColorModeValue('#ffffff', 'navy.800');
+    const brandColor = useColorModeValue("brand.500", "white");
+    const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+
 
     const onSubmit = async (data) => {
         const userData = isLogin
@@ -45,10 +70,10 @@ const AuthPage = () => {
             alert(error.response.data.message);
         }
     };
-    
-   useEffect(()=>{
-    setValue('address', account);
-   },[account])
+
+    useEffect(() => {
+        setValue('address', account);
+    }, [account])
 
     useEffect(() => {
         if (type === "login") {
@@ -83,36 +108,70 @@ const AuthPage = () => {
         isLogin
             ? inputFields.filter(field => field.name === 'email' || field.name === 'password' || field.name === 'address')
             : inputFields;
-    const [activeStep, setActiveStep] = useState(0);
-
+    const { activeStep, setActiveStep } = useSteps({
+        index: 0,
+        count: 2,
+    })
     const [isLastStep, setIsLastStep] = React.useState(false);
-    const [isFirstStep, setIsFirstStep] = React.useState(false);
+    const [isFirstStep, setIsFirstStep] = React.useState(true);
 
-    const handleNext = () => !isLastStep && selectedRole && setActiveStep((cur) => cur + 1);
-    const handlePrev = () => !isFirstStep && setActiveStep((cur) => cur - 1);
+    const handlePrev = () => (!isFirstStep && setActiveStep((cur) => cur - 1), setIsFirstStep(true), setIsLastStep(false));
+    const handleNext = () => (!isLastStep && selectedRole && setActiveStep((cur) => cur + 1), setIsFirstStep(false), setIsLastStep(true));
 
 
     return (
 
-        <div className="mt-10 h-80 flex justify-center   ">
-            <div className=" w-1/2   flex  justify-evenly  ">
-                <div className="hidden md:block   self-center  ">
-                    <IconButton onClick={handlePrev} disabled={isFirstStep} className="rounded-full" >
-                        <ChevronLeftIcon className="h-6 w-6 text-white" />
-                    </IconButton>
-                </div>
+        <Box mt="0" h="auto" display="flex" justifyContent="center">
 
-                <div className="w-96   flex flex-col  space-y-10">
-                    <div className=' '>
-                        <Stepper
-                            activeStep={activeStep}
-                            isLastStep={(value) => setIsLastStep(value)}
-                            isFirstStep={(value) => setIsFirstStep(value)}
-                        >
-                            <Step onClick={() => setActiveStep(0)}>1</Step>
-                            <Step onClick={() => selectedRole && setActiveStep(1)}>2</Step>
+
+            <Box borderRadius="20px"
+                p='7'
+                bg={cardbg}
+                backgroundClip="border-box"
+                display='flex' w="auto" justifyContent="space-evenly">
+
+
+
+                <Box display={{ base: 'none', md: 'block' }} alignSelf="center">
+                    <IconButton mr='7' fontSize='0px' icon={<ChevronLeftIcon />} color={brandColor} bg={boxBg} onClick={handlePrev} disabled={isFirstStep} isRound='true' />
+
+
+                </Box>
+
+
+                <Box w="96" display="flex" flexDirection="column" >
+                    <Box mt='0' mb='10'>
+
+
+
+                        <Stepper size='lg' colorScheme='brandScheme' index={activeStep}>
+
+                            <Step onClick={() => (setActiveStep(0), setIsFirstStep(true), setIsLastStep(false))}>
+
+                                <StepIndicator>
+                                    <StepStatus
+                                        complete={<StepIcon />}
+                                        incomplete={<StepNumber />}
+                                        active={<StepNumber />}
+                                    />
+                                </StepIndicator>
+                                <StepSeparator />
+                            </Step>
+                            <Step onClick={() => (selectedRole && setActiveStep(1), setIsFirstStep(false), setIsLastStep(true))}>
+                                <StepIndicator>
+                                    <StepStatus
+                                        complete={<StepIcon />}
+                                        incomplete={<StepNumber />}
+                                        active={<StepNumber />}
+                                    />
+                                </StepIndicator>
+                                <StepSeparator />
+                            </Step>
+
                         </Stepper>
-                    </div>
+
+                        {/* </div> */}
+                    </Box>
 
 
                     <form onSubmit={handleSubmit(onSubmit)}>
@@ -126,12 +185,13 @@ const AuthPage = () => {
                                     animate="visible"
                                     exit="exit"
                                 >
-                                    <div className=" ">
+                                    <Box>
                                         <Controller
                                             name="role"
                                             control={control}
                                             defaultValue=""
                                             rules={{ required: true }}
+
                                             render={({ field }) => (
                                                 <Select label="Select Role" {...field}>
                                                     <Option value="student">Student</Option>
@@ -140,7 +200,8 @@ const AuthPage = () => {
                                                 </Select>
                                             )}
                                         />
-                                    </div>
+                                    </Box>
+
                                 </motion.div>
                             )}
 
@@ -152,7 +213,7 @@ const AuthPage = () => {
                                     animate="visible"
                                     exit="exit"
                                 >
-                                    <div className="flex flex-col space-y-4">
+                                    <Stack spacing="5">
                                         {updatedFilteredFields.map((field, index) => (
                                             <Input
                                                 key={index}
@@ -160,7 +221,7 @@ const AuthPage = () => {
                                                 type={field.type}
                                                 {...register(field.name, { required: field.required })}
 
-                                                {...(field.name === 'address' ? {  readOnly: true, style: { backgroundColor: 'lightgray' } } : {})}
+                                                {...(field.name === 'address' ? { readOnly: true, style: { backgroundColor: 'lightgray' } } : {})}
 
                                             />
                                         ))}
@@ -168,24 +229,25 @@ const AuthPage = () => {
                                         <Button type="submit" >
                                             {isLogin ? 'Login' : 'Signup'}
                                         </Button>
-                                    </div>
+                                    </Stack>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
                     </form>
-                </div>
 
-                <div className="hidden md:block self-center    ">
-                    <IconButton onClick={handleNext} disabled={isLastStep || !selectedRole} className="rounded-full" >
-                        <ChevronRightIcon className="h-6 w-6 text-white" />
-                    </IconButton>
-                </div>
-
-            </div>
+                </Box>
 
 
-        </div>
+                <Box display={{ base: 'none', md: 'block' }} alignSelf="center">
+
+                    <IconButton ml='7' fontSize='0px' icon={<ChevronRightIcon />} color={brandColor} bg={boxBg} onClick={handleNext} disabled={isLastStep || !selectedRole} isRound='true' />
+
+                </Box>
+
+            </Box>
+
+        </Box>
 
 
     );

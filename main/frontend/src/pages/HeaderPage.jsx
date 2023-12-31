@@ -11,11 +11,16 @@ import {
   Card,
   Collapse,
 } from "@material-tailwind/react";
+import ThemeToggle from '../components/ThemeToggle';
+import FixedPlugin from '../components/FixedPlugin';
+import { ThemeEditor } from '../components/ThemeEditor';
+import { useColorModeValue } from '@chakra-ui/react';
 
 const HeaderPage = () => {
 
   const page = useResolvedPath().pathname;
 
+	const navbarIcon = useColorModeValue('gray.400', 'white');
   const { users, logout } = useUserContext();
   const [role, setRole] = useState("");
   const navigate = useNavigate();
@@ -52,6 +57,8 @@ const HeaderPage = () => {
     { path: '/UniversityPage', label: 'University' },
     { path: '/CompanyPage', label: 'Company' },
     { path: '/OwnerPage', label: 'Owner' },
+    { path: '/TestPage', label: 'Test' },
+    
   ];
 
   const renderNavItems = () => {
@@ -72,8 +79,6 @@ const HeaderPage = () => {
   };
 
   const handleLogout = () => {
-    //  console.log("l: ",role);
-   // localStorage.setItem(role, JSON.stringify({email:"",check:false}));
    localStorage.removeItem(role);         
     logout(role);
   };
@@ -81,7 +86,7 @@ const HeaderPage = () => {
   return (
     <>
 
-      <Navbar className="sticky top-0 z-50 h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4">
+      <Navbar className=" sticky top-0 z-50 h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4">
         <div className="flex items-center justify-between text-blue-gray-900">
           <Link
             to='/'
@@ -96,10 +101,15 @@ const HeaderPage = () => {
                 {renderNavItems()}
               </ul>
             </div>
+            {/* <ThemeToggle/> */}
+            <FixedPlugin/>
+            <ThemeEditor navbarIcon={navbarIcon} />
+
             {!isLoggedIn(role) ? <div className="flex items-center gap-x-1">
 
               <Button
                 variant="outlined"
+                
                 size="md"
                 className="hidden lg:inline-block "
                 onClick={() => navigate('/AuthPage/login')}
@@ -109,6 +119,7 @@ const HeaderPage = () => {
               <Button
                 variant="gradient"
                 size="md"
+                color='gray'
                 className="hidden lg:inline-block"
                 onClick={() => navigate('/AuthPage/signup')}
               >

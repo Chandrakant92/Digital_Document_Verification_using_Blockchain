@@ -1,6 +1,6 @@
 import React from 'react';
 
-import '../styles/HomePage.css'; 
+//import '../styles/HomePage.css'; 
 
 const PUBLIC_URL = "";//process.env.PUBLIC_URL;
 

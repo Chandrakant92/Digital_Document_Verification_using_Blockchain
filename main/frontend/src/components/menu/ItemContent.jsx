@@ -17,7 +17,7 @@ export function ItemContent(props) {
         w={{ base: "60px", md: "70px" }}
         me='14px'
         bg='linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'>
-        <Icon as={MdUpgrade} color='white' w={8} h={14} />
+        <Icon as={props.icon} color='white' w={8} h={14} />
       </Flex>
       <Flex flexDirection='column'>
         <Text
@@ -25,16 +25,16 @@ export function ItemContent(props) {
           fontWeight='bold'
           color={textColor}
           fontSize={{ base: "md", md: "md" }}>
-          New Update: {props.info}
+          {props.info}
         </Text>
-        <Flex alignItems='center'>
+        {/* <Flex alignItems='center'>
           <Text
             fontSize={{ base: "sm", md: "sm" }}
             lineHeight='100%'
             color={textColor}>
             A new update for your downloaded item is available!
           </Text>
-        </Flex>
+        </Flex> */}
       </Flex>
     </>
   );

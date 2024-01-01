@@ -5,6 +5,9 @@ import {
   Routes,
 } from "react-router-dom";
 
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+
 // Import your page components
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminNavbar from "./components/Navbar/Navbar";
@@ -22,14 +25,24 @@ function App() {
 	const [ toggleSidebar, setToggleSidebar ] = useState(false);
 	const { onOpen ,isOpen} = useDisclosure();
 	
-
+  toast.onChange(payload => {
+    if(payload.status === "added" ) {
+     const audio = new Audio('main/frontend/src/assets/toast_sound.mp3');
+     audio.play();
+    //  const audio = new Audio('https://drive.google.com/uc?export=download&id=1M95VOpto1cQ4FQHzNBaLf0WFQglrtWi7');
+    //  audio.play();
+     console.log("toast added")
+    }
+  })
+ 
 
 
   return (
     <Router>
       <PageProvider>
+        <ToastContainer position="bottom-right"/>
     <Box>
-    <Box>
+      
       <SidebarContext.Provider
         value={{
           toggleSidebar,
@@ -94,7 +107,7 @@ function App() {
         </Box>
       </SidebarContext.Provider>
     </Box>
-  </Box>
+  
   </PageProvider>
 </Router>
    );

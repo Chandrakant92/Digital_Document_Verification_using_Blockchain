@@ -32,6 +32,12 @@ import { useUserContext } from '../../context/UserContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import FixedPlugin from '../FixedPlugin.jsx';
 import { ItemContent } from '../menu/ItemContent.jsx';
+import { toast, ToastContainer } from 'react-toastify';
+  import "react-toastify/dist/ReactToastify.css";
+
+import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
+import { IoMdLogOut } from "react-icons/io";
+import { RiChatDeleteFill } from "react-icons/ri";
 //import routes from 'routes.js';
 export default function HeaderLinks(props) {
 	const { secondary } = props;
@@ -39,7 +45,7 @@ export default function HeaderLinks(props) {
 	const navbarIcon = useColorModeValue('gray.400', 'white');
 	let menuBg = useColorModeValue('white', 'navy.800');
 	const textColor = useColorModeValue('secondaryGray.900', 'white');
-	const textColorBrand = useColorModeValue('brand.700', 'brand.400');
+	const textColorBrand = useColorModeValue('brand.700', 'white');
 	const ethColor = useColorModeValue('gray.700', 'white');
 	const borderColor = useColorModeValue('#E6ECFA', 'rgba(135, 140, 189, 0.3)');
 	const ethBg = useColorModeValue('secondaryGray.300', 'navy.900');
@@ -49,10 +55,14 @@ export default function HeaderLinks(props) {
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.06)'
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
-	
+	const profileColor = useColorModeValue('brand.500', 'brand.400');
+	const profileText='white';
 	const { role,name,path } = usePageContext(); // Access the role from the context
 	const { users, logout } = useUserContext();
 
+
+	const { notifications, clear, markAllAsRead, markAsRead } =
+    useNotificationCenter();
   
 	const isLoggedIn = (role) => {
 	  const currentUser = users.find(user => user.role === role);
@@ -62,8 +72,12 @@ export default function HeaderLinks(props) {
 	const navigate=useNavigate();
 
 	const handleLogout = () => {
+		toast.info(`Logout Successfully`, {
+            icon:IoMdLogOut,
+          });
 		localStorage.removeItem(role);         
 		 logout(role);
+
 	   };
 	 
 	return (
@@ -115,17 +129,17 @@ export default function HeaderLinks(props) {
 						<Text fontSize="md" fontWeight="600" color={textColor}>
 							Notifications
 						</Text>
-						<Text fontSize="sm" fontWeight="500" color={textColorBrand} ms="auto" cursor="pointer">
-							Mark all read
-						</Text>
+						
+						<IconButton  bg='transparent' icon={ <RiChatDeleteFill className='h-4 w-4' />} color={textColorBrand}  onClick={() => clear()} isRound='true' ms="auto"  />
+
 					</Flex>
 					<Flex flexDirection="column" >
-						<MenuItem bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
-							<ItemContent info="Horizon UI Dashboard PRO" aName="Alicia" />
+					{notifications.length!=0 ? notifications.map((notification) => (
+						<MenuItem key={notification.id} bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
+							<ItemContent icon={notification.icon} info={notification.content}  />
 						</MenuItem>
-						<MenuItem bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
-							<ItemContent info="Horizon Design System Free" aName="Josh Henry" />
-						</MenuItem>
+						)):"No Notifications yet !!"
+						}
 					</Flex>
 				</MenuList>
 			</Menu>
@@ -194,12 +208,13 @@ export default function HeaderLinks(props) {
 			<Menu>
 				<MenuButton 
 				fontSize='md'
-				bg={ethBg}
+				bg={profileColor}
 				 fontWeight='500'
 				 w='35px'
 				 h='35px'
 				 borderRadius='50%'  
-				 color={ethColor} 
+				 color={profileText} 
+				//colorScheme='brand'
 				>
 			
               {name?.charAt(0).toUpperCase()}

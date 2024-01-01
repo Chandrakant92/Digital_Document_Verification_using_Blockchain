@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 //import { Button, Select, Input, Option } from "@material-tailwind/react";
 import { useForm, Controller } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+//import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+//import { FaChevronLeft,FaChevronRight } from "react-icons/fa6";
+import { HiChevronLeft ,HiChevronRight } from "react-icons/hi";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
@@ -30,7 +32,12 @@ import {
 import Card from '../components/card/Card';
 import IconBox from '../components/icons/IconBox';
 import InputField from '../components/fields/InputField';
-
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { IoMdLogIn } from "react-icons/io";
+import { IoMdLogOut } from "react-icons/io";
+import { MdError } from "react-icons/md";
+import { IoMdCloseCircle } from "react-icons/io";
 const AuthPage = () => {
 
     const { type } = useParams();
@@ -49,7 +56,7 @@ const AuthPage = () => {
 
     const disabledColor = useColorModeValue('secondaryGray.400', 'navy.900');
 
-    const inputRef = useRef(null);
+   
 
     const onSubmit = async (data) => {
 
@@ -68,13 +75,22 @@ const AuthPage = () => {
                     await login(data.role, { email: data.email, address: data.address });
                     localStorage.setItem(data.role, JSON.stringify({ email: data.email, address: data.address }));
                 }
-                alert(response.data.message);
+              //  alert(response.data.message);
+                toast.success(` ${isLogin ? 'Login' : 'Account Created'} Successfully`, {
+                    icon:IoMdLogIn,
+                 //   onOpen: () => playSound(),
+                  });
                 navigate(!isLogin ? '/AuthPage/login' : data.role === 'student' ? '/StudentPage' : data.role === 'university' ? '/UniversityPage' : '/CompanyPage');
             }
             console.log(response.data.message);
+            
         } catch (error) {
-            console.error(`Error ${isLogin ? 'Login' : 'Creating Account'}:`, error.response.data.message);
-            alert(error.response.data.message);
+            console.error(`Error ${isLogin ? 'Login' : 'Creating Account'}`, error.response.data.message);
+          //  alert(error.response.data.message);
+
+          toast.error(`Error ${isLogin ? 'Login' : 'Creating Account'}`, {
+            icon:IoMdCloseCircle,
+          });
         }
 
 
@@ -142,7 +158,7 @@ const AuthPage = () => {
 
 
                 <Box display={{ base: 'none', md: 'block' }} alignSelf="center">
-                    <IconButton mr='7' fontSize='0px' icon={<ChevronLeftIcon className='h-7 w-7' />} color={brandColor} bg={boxBg} onClick={handlePrev} isDisabled={isFirstStep} isRound='true' />
+                    <IconButton mr='7' fontSize='0px' icon={<HiChevronLeft className='h-7 w-7' />} color={brandColor} bg={boxBg} onClick={handlePrev} isDisabled={isFirstStep} isRound='true' />
 
 
                 </Box>
@@ -251,7 +267,7 @@ const AuthPage = () => {
 
                 <Box display={{ base: 'none', md: 'block' }} alignSelf="center">
 
-                    <IconButton ml='7' fontSize='0px' icon={<ChevronRightIcon className='h-7 w-7' />} color={brandColor} bg={boxBg} onClick={handleNext} isDisabled={isLastStep || !selectedRole} isRound='true' />
+                    <IconButton ml='7' fontSize='0px' icon={<HiChevronRight className='h-7 w-7' />} color={brandColor} bg={boxBg} onClick={handleNext} isDisabled={isLastStep || !selectedRole} isRound='true' />
 
                 </Box>
 

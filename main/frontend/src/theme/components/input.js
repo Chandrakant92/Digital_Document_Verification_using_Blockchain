@@ -24,7 +24,7 @@ export const inputStyles = {
         }),
         auth: (props) => ({
           field: {
-            fontWeight: "500",
+            // fontWeight: "500",
             color: mode("navy.700", "white")(props),
             bg: mode("transparent", "transparent")(props),
             border: "1px solid",

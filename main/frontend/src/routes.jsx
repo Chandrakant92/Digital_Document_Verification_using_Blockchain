@@ -18,7 +18,7 @@ import UniversityPage from "./pages/UniversityPage";
 import CompanyPage from "./pages/CompanyPage";
 import AuthPage from "./pages/AuthPage";
 import OwnerPage from "./pages/OwnerPage";
-import Test from "./components/Test";
+import Test from "./pages/Test";
 import { GrTest } from "react-icons/gr";
 
 const routes = [
@@ -67,7 +67,7 @@ const routes = [
   {
     name: "Authentication",
    
-    path: "/AuthPage/login",path2:"/AuthPage/:type",
+    path: "/AuthPage/login",path3: "/AuthPage/signup",path2:"/AuthPage/:type",
     icon: <Icon as={MdLock} width='20px' height='20px' color='inherit' />,
     component: <AuthPage/>,
   },

@@ -6,16 +6,7 @@ import {
 } from "react-router-dom";
 
 // Import your page components
-import HomePage from "./pages/HomePage";
-import StudentPage from "./pages/StudentPage";
-import UniversityPage from "./pages/UniversityPage";
-import CompanyPage from "./pages/CompanyPage";
-import OwnerPage from "./pages/OwnerPage";
-import MetaMaskInfo from "./metamask/MetaMaskInfo";
-import HeaderPage from "./pages/HeaderPage";
-import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Test from "./components/Test";
 import AdminNavbar from "./components/Navbar/Navbar";
 
 // Chakra imports

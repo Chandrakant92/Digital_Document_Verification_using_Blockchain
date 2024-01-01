@@ -26,6 +26,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Select,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
@@ -67,22 +68,15 @@ function Test() {
 
           
 
-            <InputField
+            {/* <InputField
              placeholder='example@mail.com'
              id='1'
              type='email'
              label='Email'
              variant='auth'
              extra='*'
-            />
-             <InputField
-             placeholder='example@mail.com'
-             id='1'
-             type='email'
-             label='Email'
-             variant='auth'
-             extra='*'
-            />
+            /> */}
+       
            
         </>
     )

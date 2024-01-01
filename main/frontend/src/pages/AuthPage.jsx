@@ -1,5 +1,5 @@
-import React, { useState, useEffect ,useRef } from 'react';
-import { Button, Select, Input, Option } from "@material-tailwind/react";
+import React, { useState, useEffect, useRef } from 'react';
+//import { Button, Select, Input, Option } from "@material-tailwind/react";
 import { useForm, Controller } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
@@ -9,9 +9,11 @@ import axios from 'axios';
 import { useMetaMaskContext } from '../context/MetaMaskContext';
 import {
     Box,
+    Button,
     Flex,
     Icon,
     IconButton,
+    Select,
     Stack,
     Step,
     StepDescription,
@@ -42,20 +44,22 @@ const AuthPage = () => {
     const { login } = useUserContext();
 
     const cardbg = useColorModeValue('#ffffff', 'navy.800');
-    const brandColor = useColorModeValue("brand.500", "white");
+    const brandColor = useColorModeValue("brand", "white");
     const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+
+    const disabledColor = useColorModeValue('secondaryGray.400', 'navy.900');
 
     const inputRef = useRef(null);
 
     const onSubmit = async (data) => {
-     
+
         const userData = isLogin
             ? { role: data.role, email: data.email, password: data.password, address: data.address }
             : { role: data.role, name: data.name, email: data.email, password: data.password, roleid: data.roleid, address: data.address };
 
         const apiEndpoint = isLogin ? 'login' : 'signup';
         console.log(isLogin ? 'login:' : 'signup:', data.role, userData);
-      
+
         try {
             const response = await axios.post(`http://localhost:5000/auth/${apiEndpoint}`, userData);
 
@@ -72,7 +76,8 @@ const AuthPage = () => {
             console.error(`Error ${isLogin ? 'Login' : 'Creating Account'}:`, error.response.data.message);
             alert(error.response.data.message);
         }
-        
+
+
     };
 
     useEffect(() => {
@@ -190,20 +195,15 @@ const AuthPage = () => {
                                     exit="exit"
                                 >
                                     <Box>
-                                        <Controller
-                                            name="role"
-                                            control={control}
-                                            defaultValue=""
-                                            rules={{ required: true }}
 
-                                            render={({ field }) => (
-                                                <Select label="Select Role" {...field}>
-                                                    <Option value="student">Student</Option>
-                                                    <Option value="university">University</Option>
-                                                    <Option value="company">Company</Option>
-                                                </Select>
-                                            )}
-                                        />
+                                        <Select variant='auth' label="Select Role"
+                                            {...register("role", { required: true })}
+                                        >
+                                            <option value="student">Student</option>
+                                            <option value="university">University</option>
+                                            <option value="company">Company</option>
+                                        </Select>
+
                                     </Box>
 
                                 </motion.div>
@@ -220,23 +220,23 @@ const AuthPage = () => {
                                     <Stack spacing="5">
                                         {updatedFilteredFields.map((field, index) => (
                                             <InputField
-                                              name={field.name } // Assign a unique name to the input field
+                                                name={field.name} // Assign a unique name to the input field
                                                 mb='0'
-                                              register={register}
+                                                register={register}
                                                 placeholder={field.label}
                                                 variant='auth'
                                                 id={index}
                                                 key={index}
                                                 label={field.label}
                                                 type={field.type}
-                                            //     {...register(field.name, { required: field.required })}
-                                                 isRequired={field.required}
-                                                {...(field.name === 'address' ? { isReadOnly: true, style: { backgroundColor: 'lightgray' } } : {})}
-
+                                                //     {...register(field.name, { required: field.required })}
+                                                isRequired={field.required}
+                                                bg={field.name === 'address' ? disabledColor : "transparent"}
+                                                isReadOnly={field.name === 'address' ? true : false}
                                             />
                                         ))}
 
-                                        <Button type="submit" >
+                                        <Button variant='brand' type="submit" >
                                             {isLogin ? 'Login' : 'Signup'}
                                         </Button>
                                     </Stack>

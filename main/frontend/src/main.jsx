@@ -8,8 +8,6 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
 import theme from './theme/theme.js'
-import { ThemeP } from './context/ThemeContext.jsx'
-import MetaMaskInfo from './metamask/MetaMaskInfo.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ChakraProvider theme={theme}>
@@ -17,13 +15,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeEditorProvider>
         <UserProvider>
           <MetaMaskProvider>
-          <MetaMaskInfo />
 
-           <ThemeP>
            
               <App />
            
-            </ThemeP>
           </MetaMaskProvider>
         </UserProvider>
       </ThemeEditorProvider>

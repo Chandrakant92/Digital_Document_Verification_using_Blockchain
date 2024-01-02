@@ -75,10 +75,10 @@ const AuthPage = () => {
                     await login(data.role, { email: data.email, address: data.address });
                     localStorage.setItem(data.role, JSON.stringify({ email: data.email, address: data.address }));
                 }
-              //  alert(response.data.message);
+           
                 toast.success(` ${isLogin ? 'Login' : 'Account Created'} Successfully`, {
                     icon:IoMdLogIn,
-                 //   onOpen: () => playSound(),
+                
                   });
                 navigate(!isLogin ? '/AuthPage/login' : data.role === 'student' ? '/StudentPage' : data.role === 'university' ? '/UniversityPage' : '/CompanyPage');
             }

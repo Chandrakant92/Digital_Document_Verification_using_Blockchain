@@ -13,13 +13,14 @@ import {
 	MenuItem,
 	MenuList,
 	Text,
-	useColorModeValue
+	useColorModeValue,
+	useDisclosure
 } from '@chakra-ui/react';
 // Custom Components
 //import { SearchBar } from 'components/navbar/searchBar/SearchBar';
 //import { SidebarResponsive } from 'components/sidebar/Sidebar';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // Assets
 //import navImage from 'assets/img/layout/Navbar.png';
 import { MdNotificationsNone, MdInfoOutline } from 'react-icons/md';
@@ -33,11 +34,13 @@ import { useNavigate } from 'react-router-dom';
 import FixedPlugin from '../FixedPlugin.jsx';
 import { ItemContent } from '../menu/ItemContent.jsx';
 import { toast, ToastContainer } from 'react-toastify';
-  import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css";
 
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { IoMdLogOut } from "react-icons/io";
 import { RiChatDeleteFill } from "react-icons/ri";
+import { useMetaMaskContext } from '../../context/MetaMaskContext.jsx';
+import { ethers } from 'ethers';
 //import routes from 'routes.js';
 export default function HeaderLinks(props) {
 	const { secondary } = props;
@@ -56,30 +59,50 @@ export default function HeaderLinks(props) {
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 	const profileColor = useColorModeValue('brand.500', 'brand.400');
-	const profileText='white';
-	const { role,name,path } = usePageContext(); // Access the role from the context
+	const profileText = 'white';
+	const { role, name, path } = usePageContext(); // Access the role from the context
 	const { users, logout } = useUserContext();
+	const { onOpen, isOpen } = useDisclosure();
+	const { provider, account } = useMetaMaskContext();
+
+	const [balance, setBalance] = useState(''); // State to hold the balance
+    useEffect(() => {
+		const getBalance = async () => {
+			try {
+				
+				const weiBalance = await provider.getBalance(account);
+				const etherBalance = ethers.utils.formatEther(weiBalance);
+				const roundedValue = Number(etherBalance).toFixed(2);
+
+               setBalance(roundedValue);
+			} catch (error) {
+				console.error('Error fetching balance:', error.message);
+			}
+		};
+		getBalance();
+	}, [account, provider])
+
 
 
 	const { notifications, clear, markAllAsRead, markAsRead } =
-    useNotificationCenter();
-  
+		useNotificationCenter();
+
 	const isLoggedIn = (role) => {
-	  const currentUser = users.find(user => user.role === role);
-	  return currentUser ? currentUser.isLoggedIn : false;
+		const currentUser = users.find(user => user.role === role);
+		return currentUser ? currentUser.isLoggedIn : false;
 	};
-  
-	const navigate=useNavigate();
+
+	const navigate = useNavigate();
 
 	const handleLogout = () => {
 		toast.info(`Logout Successfully`, {
-            icon:IoMdLogOut,
-          });
-		localStorage.removeItem(role);         
-		 logout(role);
+			icon: IoMdLogOut,
+		});
+		localStorage.removeItem(role);
+		logout(role);
 
-	   };
-	 
+	};
+
 	return (
 		<Flex
 			w={{ sm: '100%', md: 'auto' }}
@@ -103,7 +126,7 @@ export default function HeaderLinks(props) {
 					<Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
 				</Flex>
 				<Text w="max-content" color={ethColor} fontSize="sm" fontWeight="700" me="6px">
-					1,924
+					{balance}
 					<Text as="span" display={{ base: 'none', md: 'unset' }}>
 						{' '}
 						ETH
@@ -129,95 +152,95 @@ export default function HeaderLinks(props) {
 						<Text fontSize="md" fontWeight="600" color={textColor}>
 							Notifications
 						</Text>
-						
-						<IconButton  bg='transparent' icon={ <RiChatDeleteFill className='h-4 w-4' />} color={textColorBrand}  onClick={() => clear()} isRound='true' ms="auto"  />
+
+						<IconButton bg='transparent' icon={<RiChatDeleteFill className='h-4 w-4' />} color={textColorBrand} onClick={() => clear()} isRound='true' ms="auto" />
 
 					</Flex>
 					<Flex flexDirection="column" >
-					{notifications.length!=0 ? notifications.map((notification) => (
-						<MenuItem key={notification.id} bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
-							<ItemContent icon={notification.icon} info={notification.content}  />
-						</MenuItem>
-						)):"No Notifications yet !!"
+						{notifications.length != 0 ? notifications.map((notification) => (
+							<MenuItem key={notification.id} bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
+								<ItemContent icon={notification.icon} info={notification.content} />
+							</MenuItem>
+						)) : "No Notifications yet !!"
 						}
 					</Flex>
 				</MenuList>
 			</Menu>
 
-      <Menu>
-        <MenuButton p='0px'>
-          <Icon
-            mt='0px'
-            as={MdInfoOutline}
-            color={navbarIcon}
-            w='18px'
-            h='18px'
-           // me='10px'
-          />
-        </MenuButton>
-        <MenuList
-          boxShadow={shadow}
-          p='20px'
-          me={{ base: "30px", md: "unset" }}
-          borderRadius='20px'
-          bg={menuBg}
-          border='none'
-          mt='22px'
-          minW={{ base: "unset" }}
-          maxW={{ base: "360px", md: "unset" }}>
-          {/* <Image src={navImage} borderRadius='16px' mb='28px' /> */}
-          <Flex flexDirection='column'>
-            <Link
-              w='100%'
-              href='#'>
-              <Button w='100%' h='44px' mb='10px' variant='brand'>
-               Buy Now
-              </Button>
-            </Link>
-            <Link
-              w='100%'
-              href='#'>
-              <Button
-                w='100%'
-                h='44px'
-                mb='10px'
-                border='1px solid'
-                bg='transparent'
-                borderColor={borderButton}>
-                See Documentation
-              </Button>
-            </Link>
-            <Link
-              w='100%'
-              href='#'>
-              <Button
-                w='100%'
-                h='44px'
-                variant='no-hover'
-                color={textColor}
-                bg='transparent'>
-                Try for Free
-              </Button>
-            </Link>
-          </Flex>
-        </MenuList>
-      </Menu>
-	  <FixedPlugin/> 
-			 <ThemeEditor navbarIcon={navbarIcon} /> 
+			<Menu>
+				<MenuButton p='0px'>
+					<Icon
+						mt='0px'
+						as={MdInfoOutline}
+						color={navbarIcon}
+						w='18px'
+						h='18px'
+					// me='10px'
+					/>
+				</MenuButton>
+				<MenuList
+					boxShadow={shadow}
+					p='20px'
+					me={{ base: "30px", md: "unset" }}
+					borderRadius='20px'
+					bg={menuBg}
+					border='none'
+					mt='22px'
+					minW={{ base: "unset" }}
+					maxW={{ base: "360px", md: "unset" }}>
+					{/* <Image src={navImage} borderRadius='16px' mb='28px' /> */}
+					<Flex flexDirection='column'>
+						<Link
+							w='100%'
+							href='#'>
+							<Button w='100%' h='44px' mb='10px' variant='brand'>
+								Buy Now
+							</Button>
+						</Link>
+						<Link
+							w='100%'
+							href='#'>
+							<Button
+								w='100%'
+								h='44px'
+								mb='10px'
+								border='1px solid'
+								bg='transparent'
+								borderColor={borderButton}>
+								See Documentation
+							</Button>
+						</Link>
+						<Link
+							w='100%'
+							href='#'>
+							<Button
+								w='100%'
+								h='44px'
+								variant='no-hover'
+								color={textColor}
+								bg='transparent'>
+								Try for Free
+							</Button>
+						</Link>
+					</Flex>
+				</MenuList>
+			</Menu>
+			<FixedPlugin />
+			<ThemeEditor navbarIcon={navbarIcon} />
 
 			<Menu>
-				<MenuButton 
-				fontSize='md'
-				bg={profileColor}
-				 fontWeight='500'
-				 w='35px'
-				 h='35px'
-				 borderRadius='50%'  
-				 color={profileText} 
+				<MenuButton
+					fontSize='md'
+					bg={profileColor}
+					fontWeight='500'
+					w='35px'
+					h='35px'
+					borderRadius='50%'
+					color={profileText}
 				//colorScheme='brand'
 				>
-			
-              {name?.charAt(0).toUpperCase()}
+
+					{name?.charAt(0).toUpperCase()}
 				</MenuButton>
 				<MenuList boxShadow={shadow} p="0px" mt="10px" borderRadius="20px" bg={menuBg} border="none">
 					<Flex w="100%" mb="0px">
@@ -241,34 +264,34 @@ export default function HeaderLinks(props) {
 						<MenuItem bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px">
 							<Text fontSize="sm">Newsletter Settings</Text>
 						</MenuItem>
-						{!isLoggedIn(role)?
-							<MenuItem 
-							bg='transparent'
+						{!isLoggedIn(role) ?
+							<MenuItem
+								bg='transparent'
 								_hover={{ bg: 'none' }}
-								 _focus={{ bg: 'none' }}
-								
+								_focus={{ bg: 'none' }}
+
 								borderRadius="8px"
 								px="14px"
-							
+
 								onClick={() => navigate("/AuthPage/signup")}
-								>
-									<Text  fontSize="sm">Sign Up</Text>
-								
-							</MenuItem>
-						: role != 'owner' ?
-						<MenuItem 
-						bg='transparent'
-							_hover={{ bg: 'red.100' }}
-							_focus={{ bg: 'red.100' }}
-							color="red.600"
-							borderRadius="8px"
-							px="14px"
-							onClick={() => handleLogout()}
 							>
-								<Text  fontSize="sm">Log out</Text>
-							
-						</MenuItem>
-					:<></>}
+								<Text fontSize="sm">Sign Up</Text>
+
+							</MenuItem>
+							: role != 'owner' ?
+								<MenuItem
+									bg='transparent'
+									_hover={{ bg: 'red.100' }}
+									_focus={{ bg: 'red.100' }}
+									color="red.600"
+									borderRadius="8px"
+									px="14px"
+									onClick={() => handleLogout()}
+								>
+									<Text fontSize="sm">Log out</Text>
+
+								</MenuItem>
+								: <></>}
 					</Flex>
 				</MenuList>
 			</Menu>

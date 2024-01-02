@@ -31,7 +31,7 @@ function App() {
      audio.play();
     //  const audio = new Audio('https://drive.google.com/uc?export=download&id=1M95VOpto1cQ4FQHzNBaLf0WFQglrtWi7');
     //  audio.play();
-     console.log("toast added")
+   //  console.log("toast added")
     }
   })
  
@@ -66,13 +66,10 @@ function App() {
           <Portal>
             <Box>
               <AdminNavbar
-                onOpen={onOpen}
+              //  onOpen={onOpen}
               //  isOpen={isOpen}
                // logoText={'Horizon UI Dashboard PRO'}
-              //  brandText={getActiveRoute(routes)}
-              //  secondary={getActiveNavbar(routes)}
-              //  message={activeRouteName}
-                fixed={fixed}
+               fixed={fixed}
                 
               />
             </Box>

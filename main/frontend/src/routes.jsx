@@ -23,7 +23,7 @@ import { GrTest } from "react-icons/gr";
 
 const routes = [
   {
-    name: "Main Dashboard",
+    name: "Home",
     path: "/",
     icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
     component: <HomePage/>,

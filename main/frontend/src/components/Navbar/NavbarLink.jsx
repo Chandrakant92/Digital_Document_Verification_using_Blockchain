@@ -114,6 +114,7 @@ export default function HeaderLinks(props) {
 			borderRadius="30px"
 			boxShadow={shadow}>
 			{/* <SearchBar mb={secondary ? { base: '10px', md: 'unset' } : 'unset'} me="10px" borderRadius="30px" /> */}
+			{name!='Authentication' && name!='Home' &&
 			<Flex
 				bg={ethBg}
 				display={true ? 'flex' : 'none'}
@@ -133,10 +134,11 @@ export default function HeaderLinks(props) {
 					</Text>
 				</Text>
 			</Flex>
+			}
 			<SidebarResponsive routes={routes} />
-			<Menu>
-				<MenuButton ms='5px' p="0px">
-					<Icon mt="0px" as={MdNotificationsNone} color={navbarIcon} w="18px" h="18px" me="10px" />
+			<Menu >
+				<MenuButton ms='5px'  p="0px">
+					<Icon mt="0px" as={MdNotificationsNone} color={navbarIcon} w="18px" h="18px" />
 				</MenuButton>
 				<MenuList
 					boxShadow={shadow}
@@ -167,6 +169,7 @@ export default function HeaderLinks(props) {
 				</MenuList>
 			</Menu>
 
+{/* 
 			<Menu>
 				<MenuButton p='0px'>
 					<Icon
@@ -188,7 +191,6 @@ export default function HeaderLinks(props) {
 					mt='22px'
 					minW={{ base: "unset" }}
 					maxW={{ base: "360px", md: "unset" }}>
-					{/* <Image src={navImage} borderRadius='16px' mb='28px' /> */}
 					<Flex flexDirection='column'>
 						<Link
 							w='100%'
@@ -225,6 +227,7 @@ export default function HeaderLinks(props) {
 					</Flex>
 				</MenuList>
 			</Menu>
+             */}
 			<FixedPlugin />
 			<ThemeEditor navbarIcon={navbarIcon} />
 
@@ -261,9 +264,7 @@ export default function HeaderLinks(props) {
 						<MenuItem bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px">
 							<Text fontSize="sm">Profile Settings</Text>
 						</MenuItem>
-						<MenuItem bg='transparent' _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px">
-							<Text fontSize="sm">Newsletter Settings</Text>
-						</MenuItem>
+						
 						{!isLoggedIn(role) ?
 							<MenuItem
 								bg='transparent'

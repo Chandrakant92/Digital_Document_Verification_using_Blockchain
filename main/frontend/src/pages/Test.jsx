@@ -41,6 +41,13 @@ import {
 import MiniStatistics from '../components/card/MiniStatistics';
 import IconBox from '../components/icons/IconBox';
 import InputField from "../components/fields/InputField";
+import { useMetaMaskContext } from "../context/MetaMaskContext";
+import { ethers } from 'ethers';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // or import fetch from 'node-fetch'; if using the fetch API
+import Web3 from 'web3'
+import { contractAbi, contractAddress } from "../metamask/ContractInfo";
+
 function Test() {
    
     const brandColor = useColorModeValue("brand.500", "white");
@@ -61,25 +68,157 @@ function Test() {
       { bg: "secondaryGray.300" },
       { bg: "whiteAlpha.200" }
     );
-   
-   
-    return (
-        <>
 
-          
+  //  const { provider, account } = useMetaMaskContext();
 
-            {/* <InputField
-             placeholder='example@mail.com'
-             id='1'
-             type='email'
-             label='Email'
-             variant='auth'
-             extra='*'
-            /> */}
-       
-           
-        </>
-    )
+    
+  useEffect(() => {
+    const fetchTransactions = async (right) => {
+      try {
+     //right =true // originate (from = account) to To
+      //right=false// orginate from to (To=account)
+const web3 = new Web3('http://localhost:7545');
+const accounts = await web3.eth.getAccounts();
+const accountAddress = accounts[0].toLowerCase();
+console.log("Account Address:", accounts[0]);
+
+const latestBlock = await web3.eth.getBlock('latest');
+const blockNumber = BigInt(latestBlock.number);
+
+let transactionsa=[];
+let allTransactions=[];
+
+// Iterate forward through blocks to find transactions from the account
+for (let i = 0; i <= Number(blockNumber); i++) {
+  const block = await web3.eth.getBlock(i, true);
+  if (block && block.transactions) {
+    allTransactions.push(...block.transactions);
+    let accountTransactions;
+    if(right){
+      accountTransactions= block.transactions.filter(tx =>tx && tx.from.toLowerCase() === accountAddress);
+   
+    }else{
+      accountTransactions= block.transactions.filter(tx =>tx && tx.to && tx.to.toLowerCase() === accountAddress);
+   
+    }
+   
+    if (accountTransactions.length > 0) {
+      transactionsa.push(...accountTransactions);
+    }
+  }
 }
+
+console.log("ta",transactionsa);
+console.log("lta",transactionsa[transactionsa.length-1]);
+console.log("at",allTransactions);
+console.log("la",allTransactions[allTransactions.length-1]);
+
+
+
+      } catch (error) {
+        console.error('Error fetching transactions:', error.message);
+      }
+    };
+
+   // fetchTransactions(false);
+  }, []);
+
+//  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const getContractEvents = async () => {
+      try {
+        const web3 =  new Web3('http://localhost:7545'); // Replace with your Ethereum node URL
+        const transactionHash = '0x9c7a202efcca2b2791e7b172c131496852deeaf2c35c892b7b4aeb86b0ce43e6';//'0x9c7a202efcca2b2791e7b172c131496852deeaf2c35c892b7b4aeb86b0ce43e6';//'YOUR_TRANSACTION_HASH'; // Replace with the transaction hash
+
+        const transaction = await web3.eth.getTransaction(transactionHash);
+
+        if (transaction) {
+          const abi = contractAbi; // Replace with your contract's ABI
+          const contractAddressm = contractAddress; // Get the contract address from the transaction
+          const contract = new web3.eth.Contract(abi, contractAddressm);
+          const decodedLogs = await contract.getPastEvents('allEvents', {
+            fromBlock: transaction.blockNumber,
+            toBlock: transaction.blockNumber,
+            // filter: { transactionHash }
+          });
+
+          console.log("d",decodedLogs[0].returnValues.message);
+        }
+      } catch (error) {
+        console.error('Error fetching contract events:', error);
+      }
+    };
+
+    //getContractEvents();
+  }, []); // Make sure to add any dependencies if required
+
+//   useEffect(()=>{
+//     const getAllTransactions = async (right) => {
+//     try {
+//       const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+
+//       const accounts = await provider.listAccounts();
+//       const accountAddress = accounts[0].toLowerCase();
+//       console.log("Account Address:", accountAddress);
+  
+//       const latestBlockNumber = await provider.getBlockNumber();
+//       const blockNumber = BigInt(latestBlockNumber);
+  
+  
+// let transactionsa=[];
+// let allTransactions=[];
+
+//       // Iterate forward through blocks to find transactions from the account
+//       for (let i = 0; i <= Number(blockNumber); i++) {
+//         const block = await provider.getBlock(i, true);
+//         if (block && block.transactions) {
+//           allTransactions.push(...block.transactions);
+//           let accountTransactions;
+//           if(right){
+//             accountTransactions= block.transactions.filter(tx =>tx && tx.from && tx.from.toLowerCase() === accountAddress);
+         
+//           }else{
+//             accountTransactions= block.transactions.filter(tx =>tx && tx.to && tx.to.toLowerCase() === accountAddress);
+         
+//           }
+         
+//           if (accountTransactions.length > 0) {
+//             transactionsa.push(...accountTransactions);
+//           }
+//         }
+//       }
+  
+//       console.log("All Transactions:", allTransactions);
+//       console.log("Transactions from the account:", transactionsa);
+//     } catch (error) {
+//       console.error('Error fetching transactions:', error);
+//     }
+//   };
+  
+//  // getAllTransactions(true);
+  
+// },[]);
+
+
+
+  return (
+    <div>
+    <h2>Transaction History (Ganache)</h2>
+    <table>
+      {/* Display transactions in a table */}
+      <thead>
+        <tr>
+          <th>Transaction Hash</th>
+          {/* Add other transaction details as needed */}
+        </tr>
+      </thead>
+      <tbody>
+     
+      </tbody>
+    </table>
+  </div>
+  );
+};
 
 export default Test

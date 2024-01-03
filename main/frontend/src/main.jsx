@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
@@ -8,6 +8,8 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
 import theme from './theme/theme.js'
+
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ChakraProvider theme={theme}>

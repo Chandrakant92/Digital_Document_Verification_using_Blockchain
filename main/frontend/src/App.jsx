@@ -18,13 +18,16 @@ import routes from "./routes";
 import { SidebarContext } from "./context/SidebarContext";
 import Sidebar from "./components/sidebar/Sidebar";
 import { PageProvider } from "./context/PageContext";
+import { UserProvider, useUserContext } from "./context/UserContext";
+import { useMetaMaskContext } from "./context/MetaMaskContext";
 
 
 function App() {
   const [ fixed ] = useState(false);
 	const [ toggleSidebar, setToggleSidebar ] = useState(false);
 	const { onOpen ,isOpen} = useDisclosure();
-	
+  const {  users,login } = useUserContext();
+
   toast.onChange(payload => {
     if(payload.status === "added" ) {
      const audio = new Audio('main/frontend/src/assets/toast_sound.mp3');
@@ -35,11 +38,14 @@ function App() {
     }
   })
  
+  
+
 
 
   return (
     <Router>
       <PageProvider>
+      
         <ToastContainer position="bottom-right"/>
     <Box>
       
@@ -81,11 +87,12 @@ function App() {
             <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
             <Routes>
         {routes.map((route, index) => (
+          
           <Route
             key={index}
             path={route.name=='Authentication'?route.path2:route.path}
             element={
-              route.role ? (
+              route.role  ? (
                 <ProtectedRoute role={route.role}>{route.component}</ProtectedRoute>
               ) : (
                 

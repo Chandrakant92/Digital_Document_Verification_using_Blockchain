@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 // Create the context
 const UserContext = createContext();
@@ -32,6 +32,10 @@ export const UserProvider = ({ children }) => {
             isLoggedIn: true,
         }
     ]);
+
+
+
+
 
     // Login function
     const login = (role, userData) => {

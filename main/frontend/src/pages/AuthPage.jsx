@@ -72,8 +72,8 @@ const AuthPage = () => {
 
             if (response.status === 200) {
                 if (isLogin) {
-                    await login(data.role, { email: data.email, address: data.address });
-                    localStorage.setItem(data.role, JSON.stringify({ email: data.email, address: data.address }));
+                    await login(data.role, { email: data.email,password: data.password, address: data.address });
+                    localStorage.setItem(data.role, JSON.stringify({ email: data.email,password: data.password, address: data.address }));
                 }
            
                 toast.success(` ${isLogin ? 'Login' : 'Account Created'} Successfully`, {

@@ -82,9 +82,10 @@ function App() {
           </Portal>
 
           
-            <Box  mx='auto'  p={{ base: '20px', md: '30px' }} pe='20px' minH='100vh' pt='50px'>
+            <Box  mx='auto'  p={{ base: '20px', md: '30px' }} pe='20px' minH='100vh' 
+            pt={{ base: "180px", md: "110px", xl: "110px" }} >
           
-            <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+           
             <Routes>
         {routes.map((route, index) => (
           
@@ -102,7 +103,7 @@ function App() {
           />
         ))}
       </Routes>
-         </Box>
+        
             </Box>
           
           <Box>

@@ -10,9 +10,9 @@ module.exports = function (deployer) {
 
       const contractData = `const contractAddress = "${contractAddress}";\n const contractAbi = \n ${contractAbi};\n
       export { contractAddress, contractAbi };`;
-      fs.writeFileSync('../frontend/src/metamask/ContractInfo.js', contractData); // Update with your desired file path
+      fs.writeFileSync('../frontend/src/metamask/ContractInfo.jsx', contractData); // Update with your desired file path
      //auto generate//
-      console.log('Contract address and ABI saved in contractInfo.js');
+      console.log('Contract address and ABI saved in contractInfo.jsx');
     }
   });
 };

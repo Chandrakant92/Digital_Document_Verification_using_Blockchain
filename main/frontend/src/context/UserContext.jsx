@@ -28,7 +28,12 @@ export const UserProvider = ({ children }) => {
         },
         {
             role: 'owner',
-            userData: null,
+            userData: {
+                email:'owner@doqfy.com',
+                password:'123456',
+                address:'0xccbfcc2ea11f018328072a447bd9e66711283b73',
+                
+            },
             isLoggedIn: true,
         }
     ]);

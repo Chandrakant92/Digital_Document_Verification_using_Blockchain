@@ -236,5 +236,53 @@ contract Contract {
        return studentDocumentList[msg.sender];
     }
 
+      function getDocumentCompanyList(string memory uniqueId) public view returns (address[] memory) {
+       require(bytes(uniqueId).length > 0, "uniqueId cannot be empty");
+        
+       Document storage document = documentsById[uniqueId];
+        require(document.owner!= address(0), "Document does not exist");
+         
+          require(document.owner==msg.sender,"The user is not authorized to access document" );
+     
+        mapping(address => bool) storage companiesm = AccessCompanyMapping[uniqueId];
+    
+     uint256 count;
+
+    // First, count the number of addresses that have true values
+    for (uint256 i = 0; i < companyAddresses.length; i++) {
+        if (companiesm[companyAddresses[i]]) {
+            count++;
+        }
+    }
+
+    // Create an array to hold the eligible addresses
+    address[] memory allowedCompanies = new address[](count) ;
+    uint256 index = 0;
+
+    // Collect the addresses with true values
+    for (uint256 i = 0; i < companyAddresses.length; i++) {
+        if (companiesm[companyAddresses[i]]) {
+            allowedCompanies[index] = companyAddresses[i];
+            index++;
+        }
+    }
+
+    return allowedCompanies;
+
+    }
+
+    function getDocumentDetails(string memory uniqueId) public view returns(string[2] memory,address[2] memory){
+     require(bytes(uniqueId).length > 0, "uniqueId cannot be empty");
+        
+       Document storage document = documentsById[uniqueId];
+        require(document.owner!= address(0), "Document does not exist");
+         
+          require(AccessCompanyMapping[uniqueId][msg.sender] ||document.owner==msg.sender||document.universityAddress==msg.sender,"This user is not authorized to access document" );
+        string memory verifiedStr = document.verified ? "true" : "false";
+        return ([document.ipfsHash, verifiedStr],[document.owner,document.universityAddress]);
+   
+     }
+
+ 
 
 }

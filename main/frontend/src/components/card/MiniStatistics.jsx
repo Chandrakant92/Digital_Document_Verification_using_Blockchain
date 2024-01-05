@@ -39,7 +39,8 @@ export default function MiniStatistics(props) {
           <StatNumber
             color={textColor}
             fontSize={{
-              base: "2xl",
+              base: "sm",
+              md:"sm"
             }}>
             {value}
           </StatNumber>

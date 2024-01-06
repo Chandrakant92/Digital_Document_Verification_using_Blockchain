@@ -12,6 +12,24 @@ import { useMemo } from 'react';
 
 
 
+import {
+  MdAddTask,
+  MdAttachMoney,
+  MdBarChart,
+  MdFileCopy,
+} from "react-icons/md";
+
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+} from '@chakra-ui/react'
 
 import { MdCheckBox, MdDragIndicator } from "react-icons/md";
 import { MdUpload } from "react-icons/md";
@@ -22,10 +40,10 @@ import { TabelDemo } from './TabelDemo';
 
 function StudentPage() {
   const [file, setFile] = useState(null);
-  const [cid, setCid] = useState(null);
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [uuid, setUUID] = useState(null);
-
+ 
+   
+  const [uuid, setUUID] = useState(null);  //selected document//
+  const [ipfsData,setIpfsData]=useState(null);  //response from IPFS server//
 
   const { contract, account } = useMetaMaskContext();
 
@@ -41,6 +59,8 @@ function StudentPage() {
 
   const [DocumentDetails, setDocumentDetails] = useState([]); // State for selected company address
   
+  const[Transaction,setTransaction]=useState();
+
 
   const statusdiv = document.getElementById("statusdiv");
 
@@ -52,32 +72,35 @@ function StudentPage() {
   const uploadColor = useColorModeValue("brand.500", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const iconColor = useColorModeValue("secondaryGray.500", "white");
-
-
+ 
+  
 
 
 
   const handleUpload = async () => {
 
+
+    
+    setIpfsData(null);
+    setTransaction(null);
+
     const formData = new FormData();
     formData.append('certificate', file);
+
+
 
     try {
       const response = await axios.post('http://localhost:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      console.log(response.data);
 
-      setCid(response.data.cid);
-      setPdfUrl(response.data.ifpsLink);
-      setUUID(response.data.uuid);
 
-      const uniqueId = response.data.uuid;
-      const ipfsHash = response.data.cid;
-      const universityAddress = selectedUniversity; // Replace with the university's address
-      console.log("uuid: ", uniqueId, 'data-> hash: ', ipfsHash, ' university: ', universityAddress)
-      uploadDocument(uniqueId, ipfsHash, universityAddress);
+      const data = response.data;   //ifpsLink//cid//uuid//
+      setIpfsData(data);
+      console.log("IPFS server response",data);
+
+      uploadDocument(data.uuid, data.cid, selectedUniversity);
 
     } catch (error) {
       console.error(error);
@@ -95,7 +118,7 @@ function StudentPage() {
       const transaction = await contract.uploadDocument(uniqueId, ipfsHash, universityAddress, { from: account });
       await transaction.wait();
       console.log('Document uploaded successfully:', transaction);
-
+      setTransaction(transaction);
     //  statusdiv.style.display = "block";
     await  getStudentDocumentList();
     setDocumentDetails([]);
@@ -137,7 +160,6 @@ function StudentPage() {
        setDocumentDetails([]);
       getStudentDocumentList();
      
-      // getDocumentCompanyList();
     }
   }, [account]); // Add contract as a dependency
 
@@ -162,13 +184,14 @@ function StudentPage() {
   async function includeCompany() {
     try {
 
-
+       setIpfsData(null);
+       setTransaction(null);
       // Call the smart contract function
       const transaction = await contract.includeCompany(uuid, selectedCompany, { from: account });
       await transaction.wait();
       getDocumentCompanyList(uuid);
       console.log('Company included successfully:', transaction);
-
+      setTransaction(transaction);
 
     } catch (error) {
       console.error('Error including company:', error.reason);
@@ -178,13 +201,15 @@ function StudentPage() {
   async function removeCompany() {
     try {
 
+      setIpfsData(null);
+      setTransaction(null);
 
       // Call the smart contract function
       const transaction = await contract.removeCompany(uuid, selectedCompany, { from: account });
       await transaction.wait();
       getDocumentCompanyList(uuid);
       console.log('Company removed successfully:', transaction);
-
+      setTransaction(transaction);
 
     } catch (error) {
       console.error('Error removing company:', error.reason);
@@ -194,7 +219,6 @@ function StudentPage() {
 
   const handleDocumentChange = (event) => {
     setUUID(event.target.value);
-    // console.log(event.target.value);
     getDocumentCompanyList(event.target.value);
   };
 
@@ -217,7 +241,6 @@ function StudentPage() {
         setDocumentCompanylist([]);
         return;
       };
-      // console.log("d",uuid);
       const transaction = await contract.getDocumentCompanyList(uuid, { from: account });
       console.log('Response getDocumentCompanyList:', transaction); // Log the response
 
@@ -229,27 +252,32 @@ function StudentPage() {
 
   useEffect(() => {
     setDocumentDetails([]);
-    studentDocumentlist.forEach((uuid) => {
-    
-    getDocumentDetails(uuid);
-    });
-    
-   
+    const fetchData = async () => {
+      const collectedData = [];
+      for (const uuid of studentDocumentlist) {
+        const data = await getDocumentDetails(uuid);
+        collectedData.push(data);
+      }
+      setDocumentDetails(collectedData);
+    };
+
+    fetchData();
   }, [studentDocumentlist]);
-  
+
   const getDocumentDetails = async (uuid) => {
     try {
       if (!uuid) {
        
         return;
       };
-      // console.log("d",uuid);
       const transaction = await contract.getDocumentDetails(uuid, { from: account });
-      console.log('Response getDocumentDetails:', ...transaction); // Log the response
-      const simpleArray = [].concat(...transaction);
-      simpleArray.push(uuid);
-      //return simpleArray;
-      setDocumentDetails(prevState => [...prevState, simpleArray]);
+      const arr = [].concat(...transaction);
+      arr.push(uuid);
+      arr.splice(2, 1);
+      [arr[0], arr[1], arr[2], arr[3]] = [arr[3], arr[2], arr[0], arr[1]];
+
+      console.log('Response getDocumentDetails:',arr);
+      return arr;
     } catch (error) {
       console.error('Error fetching DocumentCompanyList:', error.reason);
     }
@@ -258,21 +286,12 @@ function StudentPage() {
   const onDrop = useCallback((acceptedFiles) => {
    
     setFile(acceptedFiles[0]);
-    setCid(null);
-    setPdfUrl(null);
+    
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: '.pdf', });
 
   
-  const DocumentDetailstabel = DocumentDetails.map((doc,index)=>({
-          id:index,
-          document:doc[4],
-          university:doc[3],
-          ipfs_cid:doc[0],
-          verified:doc[1],
-  }))
-
 
           
 
@@ -289,13 +308,29 @@ function StudentPage() {
                 h='40px'
                 bg={boxBg}
                 icon={
-                  <Icon w='20px' h='20px' as={FaRegAddressBook} color={brandColor} />
+                  <Icon w='20px' h='20px' as={FaRegAddressBook} color={uploadColor} />
                 }
               />
             }
             name='Account'
             value={account}
           />
+          <MiniStatistics
+            startContent={
+              <IconBox
+                w='40px'
+                h='40px'
+                bg={boxBg}
+                icon={
+                  <Icon w='20px' h='20px' as={MdFileCopy} color={uploadColor} />
+                }
+              />
+            }
+            name='Total Documents'
+            value={studentDocumentlist.length}
+          />
+          
+
         </SimpleGrid>
 
         <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
@@ -369,6 +404,73 @@ function StudentPage() {
 
 
           </Stack>
+          <Stack borderRadius="20px"
+            p='7'
+            bg={cardbg}
+            backgroundClip="border-box"
+            spacing='0'
+          >
+            <Text mb='10'
+              color={textColor}
+              fontSize='22px'
+              fontWeight='500'
+              lineHeight='100%'>
+              Document Details
+            </Text>
+{  Transaction  ?   
+<Box  borderWidth='1px' borderRadius='lg'>
+  <TableContainer>
+  <Table variant='simple' size='sm'>
+    <Tbody>
+      <Tr>
+        <Th>Document: </Th>
+        <Td>{ipfsData ?ipfsData.uuid:uuid}</Td>   
+      </Tr>    
+
+      <Tr>
+        <Th>TX: </Th>
+        <Td> {Transaction.hash}</Td>
+      </Tr>
+      <Tr>
+        <Th>From: </Th>
+        <Td>{Transaction.from}</Td>   
+      </Tr>
+      <Tr>
+        <Th>To: </Th>
+        <Td>{Transaction.to}</Td>   
+      </Tr>
+      <Tr>
+        <Th>Nonce: </Th>
+        <Td> {Transaction.nonce}</Td>   
+      </Tr>
+     
+      {ipfsData &&
+      <>
+      <Tr>
+        <Th>IPFS CID: </Th>
+        <Td>{ipfsData.cid}</Td>   
+      </Tr>
+      <Tr>
+        <Th>IPFS Link: </Th>
+        <Td>{ipfsData.ifpsLink}</Td>   
+      </Tr>
+      </>
+      }
+
+      </Tbody>
+      </Table>
+      </TableContainer>
+      </Box> :
+      <Text 
+      color={textColor}
+      fontSize='16px'
+      textAlign='center'
+      fontWeight='500'
+      mt='10'
+      lineHeight='100%'>No Transaction Yet!!</Text>
+}
+
+         </Stack>
         </SimpleGrid>
         <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
           <Stack
@@ -436,7 +538,8 @@ function StudentPage() {
               Document Companies List
             </Text>
 
-
+            <TabelDemo data={[DocumentCompanylist]} headers={["S.N","Companies"]} />
+ 
 
           </Stack>
 
@@ -458,7 +561,7 @@ function StudentPage() {
               lineHeight='100%'>
               Student Document List
             </Text>
-  <TabelDemo data={DocumentDetailstabel}/>
+  <TabelDemo data={DocumentDetails} headers={["S.N","Document","University","IPFS CID","Verified"]} />
  
 
             </Stack>

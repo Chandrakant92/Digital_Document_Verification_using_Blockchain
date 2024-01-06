@@ -12,7 +12,7 @@ import { createRoot } from 'react-dom/client';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Theme
-import { Icon, Input, InputGroup, InputLeftElement, Stack, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import { Flex, Icon, Input, InputGroup, InputLeftElement, Stack, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 
@@ -40,15 +40,42 @@ const TabelDemo = (props) => {
   const uploadColor = useColorModeValue("brand.500", "white");
 
   // Row Data: The data to be displayed.
-  const [rowData, setRowData] = useState([]);
+  const [rowData, setRowData] = useState();
+  const [colDefs, setColDefs] = useState();
+
+
   useEffect(() => {
-    setRowData(props.data);
-    console.log("d", props.data);
-  }, [props])
+    if (props.data && props.headers) {
+      const columnDefs = props.headers.map((header,index) => ({
+        headerName: header,
+        field: `field_${index}`,
+        
+        cellRenderer: header === 'Verified' ? verifiedCellRenderer : undefined,
+      }));
+
+      const rowData = props.data.map((rowDataItem, index) => {
+        if(rowDataItem.length>0){
+        const rowObj = {};
+          rowDataItem.forEach((item, colIndex) => {
+          const field = `field_${colIndex+1}`; 
+          rowObj[field] = item;
+        });
+      
+        rowObj[`field_0`] =  index; 
+      
+        return rowObj;
+      }
+      });
+      
+      setColDefs(columnDefs);
+      setRowData(rowData);
+    }
+  }, [props.data, props.headers]);
+
 
 
   const verifiedCellRenderer = (params) => {
-    return <Icon
+    return (<Flex justifyContent='center'><Icon
       w='24px'
       h='24px'
       me='5px'
@@ -62,18 +89,24 @@ const TabelDemo = (props) => {
               MdCheckCircle
             :  MdCancel
          }
-    />
+    /> </Flex>)
   };
 
   // Column Definitions: Defines & controls grid columns.
-  const [colDefs, setColDefs] = useState([
-    { headerName: 'S.N', field: 'id', width: 100, },
-    { headerName: 'Document', field: 'document' },
-    { headerName: 'University', field: 'university' },
-    { headerName: 'IPFS CID', field: 'ipfs_cid' },
-    { headerName: 'Verified', field: 'verified', cellRenderer: verifiedCellRenderer,}
-  ]);
 
+
+  const autoSizeStrategy = useMemo(() => {
+    return {
+    //  type: 'fitGridWidth',
+      //defaultMinWidth: 100,
+      // columnLimits: [
+      //   {
+      //     colId: 'country',
+      //     minWidth: 900,
+      //   },
+      // ],
+    };
+  }, []);
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
@@ -109,10 +142,9 @@ const TabelDemo = (props) => {
         }
         style={gridStyle}
       >
-        <AgGridReact ref={gridRef} rowData={rowData} columnDefs={colDefs}
-        // frameworkComponents={{
-        //   iconComponent: IconComponent
-        // }}
+        <AgGridReact ref={gridRef} rowData={rowData} columnDefs={colDefs} 
+        autoSizeStrategy={autoSizeStrategy}
+       
         />
       </div>
       </div>

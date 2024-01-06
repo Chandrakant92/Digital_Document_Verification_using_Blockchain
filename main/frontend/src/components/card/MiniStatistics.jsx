@@ -40,7 +40,7 @@ export default function MiniStatistics(props) {
             color={textColor}
             fontSize={{
               base: "sm",
-              md:"sm"
+              md:"md"
             }}>
             {value}
           </StatNumber>

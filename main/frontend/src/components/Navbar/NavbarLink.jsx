@@ -41,6 +41,7 @@ import { IoMdLogOut } from "react-icons/io";
 import { RiChatDeleteFill } from "react-icons/ri";
 import { useMetaMaskContext } from '../../context/MetaMaskContext.jsx';
 import { ethers } from 'ethers';
+import playToastSound from '../../mainComponents/ToastSound.jsx';
 //import routes from 'routes.js';
 export default function HeaderLinks(props) {
 	const { secondary } = props;
@@ -97,6 +98,9 @@ export default function HeaderLinks(props) {
 	const handleLogout = () => {
 		toast.info(`Logout Successfully`, {
 			icon: IoMdLogOut,
+			onOpen: () => {
+				playToastSound(); // Play the sound when the toast opens
+			  },
 		});
 		localStorage.removeItem(role);
 		logout(role);

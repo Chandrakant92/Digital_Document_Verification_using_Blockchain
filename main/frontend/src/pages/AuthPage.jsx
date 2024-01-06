@@ -38,6 +38,7 @@ import { IoMdLogIn } from "react-icons/io";
 import { IoMdLogOut } from "react-icons/io";
 import { MdError } from "react-icons/md";
 import { IoMdCloseCircle } from "react-icons/io";
+import playToastSound from '../mainComponents/ToastSound';
 const AuthPage = () => {
 
     const { type } = useParams();
@@ -78,7 +79,9 @@ const AuthPage = () => {
            
                 toast.success(` ${isLogin ? 'Login' : 'Account Created'} Successfully`, {
                     icon:IoMdLogIn,
-                
+                    onOpen: () => {
+                        playToastSound(); // Play the sound when the toast opens
+                      },
                   });
                 navigate(!isLogin ? '/AuthPage/login' : data.role === 'student' ? '/StudentPage' : data.role === 'university' ? '/UniversityPage' : '/CompanyPage');
             }
@@ -90,6 +93,9 @@ const AuthPage = () => {
 
           toast.error(`Error ${isLogin ? 'Login' : 'Creating Account'}`, {
             icon:IoMdCloseCircle,
+            onOpen: () => {
+                playToastSound(); // Play the sound when the toast opens
+              },
           });
         }
 

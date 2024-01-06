@@ -12,13 +12,15 @@ import { createRoot } from 'react-dom/client';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Theme
-import { Flex, Icon, Input, InputGroup, InputLeftElement, Stack, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import { Flex, Icon, Input, InputGroup, InputLeftElement, Stack, Text, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 
 // Create new GridExample component
-const TabelDemo = (props) => {
+const TabelCard = ({data,headers,heading,searchLabel,searchId}) => {
   const { colorMode } = useColorMode();
+  const cardbg = useColorModeValue('#ffffff', 'navy.800');
+  const textColor = useColorModeValue("secondaryGray.900", "white");
 
   const theme = colorMode === 'dark' ? 'ag-theme-quartz-dark' : 'ag-theme-quartz';
 
@@ -45,15 +47,15 @@ const TabelDemo = (props) => {
 
 
   useEffect(() => {
-    if (props.data && props.headers) {
-      const columnDefs = props.headers.map((header,index) => ({
+    if (data && headers) {
+      const columnDefs = headers.map((header,index) => ({
         headerName: header,
         field: `field_${index}`,
         
         cellRenderer: header === 'Verified' ? verifiedCellRenderer : undefined,
       }));
 
-      const rowData = props.data.map((rowDataItem, index) => {
+      const rowData = data.map((rowDataItem, index) => {
         if(rowDataItem.length>0){
         const rowObj = {};
           rowDataItem.forEach((item, colIndex) => {
@@ -70,7 +72,7 @@ const TabelDemo = (props) => {
       setColDefs(columnDefs);
       setRowData(rowData);
     }
-  }, [props.data, props.headers]);
+  }, [data, headers]);
 
 
 
@@ -111,12 +113,26 @@ const TabelDemo = (props) => {
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       'quickFilterText',
-      document.getElementById('filter-text-box').value
+      document.getElementById(`filter-text-box-${searchId}`).value
     );
   }, []);
 
   // Container: Defines the grid's theme & dimensions.
   return (
+    <Stack
+    borderRadius="20px"
+    p='7'
+    bg={cardbg}
+    backgroundClip="border-box"
+    spacing='5'
+  >
+    <Text mb='3'
+      color={textColor}
+      fontSize='22px'
+      fontWeight='500'
+      lineHeight='100%'>
+      {heading}
+    </Text>
     <div>
       <style>{customCSS}</style>
       <Stack spacing={10} w='200px' mb='5'>
@@ -126,12 +142,11 @@ const TabelDemo = (props) => {
             color={uploadColor}
             children={<FaSearch />}
           />
-          <Input size='md' variant='auth' placeholder="Search Document"
+          <Input size='md' variant='auth' 
+          placeholder={searchLabel}
             onChange={onFilterTextBoxChanged}
             type="text"
-            id="filter-text-box"
-
-
+            id={`filter-text-box-${searchId}`}
           />
         </InputGroup>
       </Stack>
@@ -149,6 +164,7 @@ const TabelDemo = (props) => {
       </div>
       </div>
     </div>
+    </Stack>
   );
 };
-export { TabelDemo };
+export { TabelCard };

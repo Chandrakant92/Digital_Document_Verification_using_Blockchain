@@ -19,6 +19,7 @@ import {
 } from "react-icons/md";
 
 
+import { FaBuilding } from "react-icons/fa";
 import { MdCheckBox, MdDragIndicator } from "react-icons/md";
 import { MdUpload } from "react-icons/md";
 
@@ -58,7 +59,6 @@ function StudentPage() {
   const [Transaction, setTransaction] = useState();
 
 
-  const statusdiv = document.getElementById("statusdiv");
 
   const cardbg = useColorModeValue('#ffffff', 'navy.800');
   const brandColor = useColorModeValue("brand", "white");
@@ -116,7 +116,6 @@ function StudentPage() {
       await transaction.wait();
       console.log('Document uploaded successfully:', transaction);
       setTransaction(transaction);
-      //  statusdiv.style.display = "block";
       await getStudentDocumentList();
       setDocumentDetails([]);
 
@@ -128,7 +127,6 @@ function StudentPage() {
       });
     } catch (error) {
 
-      statusdiv.style.display = "none";
       console.error('Error uploading document:', error.reason);
       toast.error('Error uploading document', {
         icon:IoMdCloseCircle,
@@ -202,8 +200,8 @@ function StudentPage() {
       console.log('Company included successfully:', transaction);
       setTransaction(transaction);
 
-      toast.success(' Company included Successfully', {
-        icon:MdFileCopy,
+      toast.success('Company included Successfully', {
+        icon:FaBuilding,
         onOpen: () => {
             playToastSound(); // Play the sound when the toast opens
           },
@@ -234,7 +232,7 @@ function StudentPage() {
       setTransaction(transaction);
 
       toast.success('Company removed Successfully', {
-        icon:MdFileCopy,
+        icon:FaBuilding,
         onOpen: () => {
             playToastSound(); // Play the sound when the toast opens
           },
@@ -394,7 +392,7 @@ function StudentPage() {
         <CompanyManage
           handleDocumentChange={handleDocumentChange}
           uuid={uuid}
-          studentDocumentlist={studentDocumentlist}
+          Documentlist={studentDocumentlist}
           handleCompanyChange={handleCompanyChange}
           selectedCompany={selectedCompany}
           companyAddresses={companyAddresses}

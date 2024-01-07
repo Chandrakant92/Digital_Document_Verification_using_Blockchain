@@ -14,12 +14,11 @@ import {
   } from '@chakra-ui/react'
   
 const TransactionCard = ({Transaction,ipfsData,uuid}) => {
-
+            
 
     const cardbg = useColorModeValue('#ffffff', 'navy.800');
     const textColor = useColorModeValue("secondaryGray.900", "white");
  
-
 
   return (
    <>
@@ -43,11 +42,12 @@ spacing='0'
 <TableContainer>
 <Table variant='simple' size='sm'>
 <Tbody>
-<Tr>
-<Th>Document: </Th>
-<Td>{ipfsData ?ipfsData.uuid:uuid}</Td>   
-</Tr>    
-
+{ipfsData || uuid ? (
+  <Tr>
+    <Th>Document:</Th>
+    <Td>{ipfsData ? ipfsData.uuid : uuid ? uuid : "not defined"}</Td>
+  </Tr>
+) : null}
 <Tr>
 <Th>TX: </Th>
 <Td> {Transaction.hash}</Td>
@@ -73,7 +73,7 @@ spacing='0'
 </Tr>
 <Tr>
 <Th>IPFS Link: </Th>
-<Td>{ipfsData.ifpsLink}</Td>   
+<Td color={'blue'}><a href={ipfsData.ifpsLink} target='_blank'>{ipfsData.ifpsLink}</a></Td>   
 </Tr>
 </>
 }

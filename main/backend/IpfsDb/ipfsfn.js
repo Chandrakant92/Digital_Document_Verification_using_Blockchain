@@ -93,7 +93,8 @@ ipfsRouter.post("/issue", upload.single("certificate"),
             const cid = await uploadFileToIPFS(appendedFilePath);
             res.json({
                 ifpsLink: `http://localhost:8080/ipfs/${cid}`, //`https://ipfs.io/ipfs/${cid}/?filename=${id}.pdf`,
-                cid: cid.toString()
+                cid: cid.toString(),
+                uuid: id,
             });
         } catch (error) {
             console.error(error);

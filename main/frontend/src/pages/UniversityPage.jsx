@@ -1,46 +1,112 @@
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useMetaMaskContext } from '../context/MetaMaskContext';
 import axios from 'axios';
 
 import * as XLSX from 'xlsx';
 
 import { v4 as uuid } from "uuid";
+
+
+import MiniStatistics from '../components/card/MiniStatistics';
+import IconBox from '../components/icons/IconBox';
+import { Box, Button, Card, Checkbox, CheckboxGroup, Flex, Icon, IconButton, Input, Select, SimpleGrid, Stack, useCheckboxGroup, useColorModeValue } from '@chakra-ui/react';
+import { FaRegAddressBook } from "react-icons/fa";
+import { useDropzone } from 'react-dropzone';
+import { Text } from '@chakra-ui/react';
+
+import { useMemo } from 'react';
+
+import { FaBuilding } from "react-icons/fa";
+
+import { FaUniversity } from "react-icons/fa";
+import {
+  MdAddTask,
+  MdAttachMoney,
+  MdBarChart,
+  MdFileCopy,
+} from "react-icons/md";
+import { MdOutlineVerified } from "react-icons/md";
+
+import { MdCheckBox, MdDragIndicator } from "react-icons/md";
+import { MdUpload } from "react-icons/md";
+
+import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
+import { TabelCard } from '../mainComponents/TabelCard';
+import TransactionCard from '../mainComponents/TransactionCard';
+import CompanyManage from '../mainComponents/CompanyManage';
+import FileUpload from '../mainComponents/FileUpload';
+
+
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { IoMdCloseCircle } from "react-icons/io";
+import playToastSound from '../mainComponents/ToastSound';
+
+
+
+
+
 // Create a Web3 instance using the current Ethereum provider (MetaMask)
 function UniversityPage() {
   const [file, setFile] = useState(null);
-  const [oldcid, setoldCid] = useState(null);
-  const [newcid, setnewCid] = useState(null);
-  
-  const [pdfUrl, setPdfUrl] = useState(null);
+  // const [oldcid, setoldCid] = useState(null);
+  // const [newcid, setnewCid] = useState(null);
+
+  const [ipfsData, setIpfsData] = useState(null);  //response from IPFS server//
+
+  const [Transaction, setTransaction] = useState(); //trnsaction detail//
+
+
+  //  const [pdfUrl, setPdfUrl] = useState(null);
 
   const { contract, account } = useMetaMaskContext();
 
   const [companyAddresses, setCompanyAddresses] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(''); // State for selected company address
-  
+
   const [universityDocumentlist, setUniversityDocumentlist] = useState([]); // State for selected company address
   const [selectedUUID, setSelectedUUID] = useState(''); // State for selected company address
-  
+
+  const [DocumentCompanylist, setDocumentCompanylist] = useState([]); // State for selected company address
+
+  const [DocumentDetails, setDocumentDetails] = useState([]); // State for selected company address
+
+
+  const [isUniversityVerified, setisUniversityVerified] = useState(null);
+
+
+  //multiple file upload //
   const [excelFile, setExcelFile] = useState(null);
   const [uploadData, setUploadData] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
 
+  ///colors//
+  const cardbg = useColorModeValue('#ffffff', 'navy.800');
+  const brandColor = useColorModeValue("brand", "white");
+  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const bg = useColorModeValue("gray.100", "navy.700");
+  const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
+  const uploadColor = useColorModeValue("brand.500", "white");
+  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const iconColor = useColorModeValue("secondaryGray.500", "white");
 
-  const statusdiv= document.getElementById("statusdiv");
- 
 
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setoldCid(null);
-    setnewCid(null);
-    setPdfUrl(null);
-  };
+
+
+
+  const onDrop = useCallback((acceptedFiles) => {  //sigle file upload for verification
+
+    setFile(acceptedFiles[0]);
+
+  }, []);
 
 
 
   const getHash = async () => { //hash for verify//
+    setIpfsData(null);
+    setTransaction(null);
     const formData = new FormData();
     formData.append('certificate', file);
     formData.append('selectedUUID', selectedUUID); // Include the selectedUUID in the formData
@@ -49,60 +115,69 @@ function UniversityPage() {
       const oldresponse = await axios.post('http://localhost:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-    
-      
-      
-    console.log(oldresponse.data);
-
-    setoldCid(oldresponse.data.cid);
-   const check= await checkStatusnVerify(oldresponse.data.cid);
-    
-    if(check){
 
 
-    try {
-      const newresponse = await axios.post('http://localhost:5000/issue', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-  
+
+      console.log("oldresponse", oldresponse.data);
+
+      //  setoldCid(oldresponse.data.cid);
+      const check = await checkStatusnVerify(oldresponse.data.cid);
+
+      if (check) {
+
+
+        try {
+          const newresponse = await axios.post('http://localhost:5000/issue', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+
           console.log(newresponse.data);
-  
-      setnewCid(newresponse.data.cid);
-  
-      setPdfUrl(newresponse.data.ifpsLink);
-      verifyDocument(oldresponse.data.cid,newresponse.data.cid);
-  
+          const data = newresponse.data;   //cid//ifpsLink//uuid
+
+          setIpfsData(data);
+          verifyDocument(oldresponse.data.cid, newresponse.data.cid);
+
+
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        console.error("Document is invalid");
+      }
+
     } catch (error) {
       console.error(error);
     }
-  }else{
-    console.error("Document is invalid");
-  }
+  };
 
-  } catch (error) {
-    console.error(error);
-  }
-};
+  async function checkStatusnVerify(_cid) {
+    try {
 
-async function checkStatusnVerify(_cid) {
-  try {
 
-  
 
-    const transaction = await contract.checknverify(selectedUUID,_cid,{ from: account });
-    
-    console.log('Document is Verified:', transaction);
-      return true;
-  } catch (error) {
-    console.error('Error checking verification status:',error);
-    // Handle the error here
+      const transaction = await contract.checknverify(selectedUUID, _cid, { from: account });
+
+      console.log('Document is Verified:', transaction);
+      return !transaction;
+    } catch (error) {
+      toast.error('Invalid Document', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+     
+      console.error('Error checking verification status:', error);
+      // Handle the error here
       return false;
+    }
   }
-}
 
 
 
   const getHash2 = async () => { //hash for unverify//
+    setIpfsData(null);
+    setTransaction(null);
     const formData = new FormData();
     formData.append('certificate', file);
     formData.append('selectedUUID', selectedUUID); // Include the selectedUUID in the formData
@@ -111,15 +186,12 @@ async function checkStatusnVerify(_cid) {
       const newresponse = await axios.post('http://localhost:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      
-      
-    console.log(newresponse.data);
 
-    setnewCid(newresponse.data.cid);
-    setoldCid(null);
-    setPdfUrl(null);
 
-    unverifyDocument(newresponse.data.cid);
+      console.log(newresponse.data);
+
+
+      unverifyDocument(newresponse.data.cid);
 
     } catch (error) {
       console.error(error);
@@ -128,52 +200,72 @@ async function checkStatusnVerify(_cid) {
 
   };
 
-  
-
-// Define your document upload function
-async function verifyDocument(_oldcid,_newcid) {
-  try {
-   
-    // Call the smart contract function
-    console.log("data:",selectedUUID,_oldcid,_newcid);
-    const transaction = await contract.verifyDocument(selectedUUID,_oldcid,_newcid,{ from: account });
-    await transaction.wait();
-    
-    statusdiv.style.display="block";
-    console.log('Document Verified successfully:', transaction);
 
 
-  } catch (error) {
-    
-    statusdiv.style.display="none";
-    console.error('Error verifying document:',error);
-    // Handle the error here
+  // Define your document upload function
+  async function verifyDocument(_oldcid, _newcid) {
+    try {
+
+      // Call the smart contract function
+      console.log("data:", selectedUUID, _oldcid, _newcid);
+      const transaction = await contract.verifyDocument(selectedUUID, _oldcid, _newcid, { from: account });
+      await transaction.wait();
+      setTransaction(transaction);
+      console.log('Document Verified successfully:', transaction);
+      getUniversityDocumentList();
+      toast.success(' Document verified Successfully', {
+        icon:MdOutlineVerified,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+    } catch (error) {
+      toast.error('Error verifying document', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+      console.error('Error verifying document:', error);
+      // Handle the error here
+    }
   }
-}
-async function unverifyDocument(_newcid) {
-  try {
-    
-    // Call the smart contract function
-    const transaction = await contract.unverifyDocument(selectedUUID,_newcid,{ from: account });
-    await transaction.wait();
+  async function unverifyDocument(_newcid) {
+    try {
 
-    console.log('Document unVerified successfully:', transaction);
-
-
-  } catch (error) {
-    console.error('Error unverifying document:',error.reason);
-    // Handle the error here
+      // Call the smart contract function
+      const transaction = await contract.unverifyDocument(selectedUUID, _newcid, { from: account });
+      await transaction.wait();
+      setTransaction(transaction);
+      console.log('Document unVerified successfully:', transaction);
+      getUniversityDocumentList();
+      toast.success(' Document un-verified Successfully', {
+        icon:MdOutlineVerified,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+    } catch (error) {
+      toast.error('Error un-verifying document', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+      console.error('Error unverifying document:', error.reason);
+      // Handle the error here
+    }
   }
-}
 
 
 
   useEffect(() => {
     // Check if contract is not null
     if (contract !== null) {
-      
+
       getUniversityDocumentList();
       fetchCompanyAddresses();
+      checkUniversity();
     }
   }, [account]); // Add contract as a dependency
 
@@ -183,9 +275,11 @@ async function unverifyDocument(_newcid) {
   };
   const handleDocumentChange = (event) => {
     setSelectedUUID(event.target.value);
+
+    getDocumentCompanyList(event.target.value);
   };
 
- // Function to fetch company addresses from the smart contract
+  // Function to fetch company addresses from the smart contract
   const fetchCompanyAddresses = async () => {
     try {
       const transaction = await contract.getAllCompanyAddresses({ from: account });
@@ -201,234 +295,458 @@ async function unverifyDocument(_newcid) {
 
   async function includeCompany() {
     try {
-     
+      setIpfsData(null);
+      setTransaction(null);
       // Call the smart contract function
-      const transaction = await contract.includeCompany(selectedUUID,selectedCompany,{ from: account });
+      const transaction = await contract.includeCompany(selectedUUID, selectedCompany, { from: account });
       await transaction.wait();
-      console.log('Company included successfully:', transaction.transactionHash);
-  
-  
+      setTransaction(transaction);
+
+      getDocumentCompanyList(selectedUUID);
+      console.log('Company included successfully:', transaction);
+      toast.success('Company included Successfully', {
+        icon:FaBuilding,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+
     } catch (error) {
-      console.error('Error including company:',error.reason);
+      console.error('Error including company:', error.reason);
+      toast.error('Error including company', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+    
       // Handle the error here
     }
   }
   async function removeCompany() {
     try {
-  
-     
+      setIpfsData(null);
+
+      setTransaction(null);
       // Call the smart contract function
-      const transaction = await contract.removeCompany(selectedUUID,selectedCompany,{ from: account });
+      const transaction = await contract.removeCompany(selectedUUID, selectedCompany, { from: account });
       await transaction.wait();
-  
+      setTransaction(transaction);
+
+      getDocumentCompanyList(selectedUUID);
       console.log('Company removed successfully:', transaction.transactionHash);
-  
-  
+      toast.success('Company removed Successfully', {
+        icon:FaBuilding,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+
     } catch (error) {
-      console.error('Error removing company:',error.reason);
+      console.error('Error removing company:', error.reason);
+      toast.error('Error removing company', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
       // Handle the error here
     }
   }
 
 
 
-  
-// Define your document upload function
-async function addUniversityfn() {
-  try {
 
+  // Define your document upload function
+  async function addUniversityfn() {
+    try {
+      setIpfsData(null);
+
+      setTransaction(null);
+      setSelectedUUID('');
       // Call the 'addUniversity' function with the provided university address
       const transaction = await contract.addUniversity({ from: account });
 
       // Wait for the transaction to be mined and get the transaction hash
       await transaction.wait();
+      setTransaction(transaction);
+      console.log('University added successfully:', transaction);
+      toast.success('University registered successfully', {
+        icon:FaUniversity,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
 
-     console.log('University added successfully:', transaction);
-  
-  } catch (error) {
-    console.error('Error UniversityAdded:',error.reason);
-    // Handle the error here
-  }
-}
-
-async function checkUniversity() {
-  try {
-   
-    // Call the smart contract function
-    const transaction = await contract.checkUniversity(account,{ from: account });
-   
-    console.log('university status:', transaction);
-
-
-  } catch (error) {
-    console.error('Error checking university:',error.reason);
-    // Handle the error here
-  }
-}
-
- const getUniversityDocumentList = async () => {
-  try {
-    const transaction = await contract.getUniversityDocumentList({ from: account });
-    console.log('Response getUniversityDocumentList:', transaction); // Log the response
-   
-    setUniversityDocumentlist(transaction);
-  } catch (error) {
-    console.error('Error fetching documents:', error.reason);
-  }
-};
-
-async function viewDocument() {
-  window.location.href = `/CompanyPage?document=${selectedUUID}`;
-}
-
-//multiple file uplaod//
-
-const handleExcelFileChange = (event) => {
-  const file = event.target.files[0];
-  setExcelFile(file);
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-
-    const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
-    const worksheet = workbook.Sheets[sheetName];
-   
-    const excelData = XLSX.utils.sheet_to_json(worksheet);
-    setUploadData(excelData);
-    console.log("data: ",excelData);
-  };
-  reader.readAsArrayBuffer(file);
-};
-
-const handleFilesChange = (event) => {
-  const files = event.target.files;
-  setSelectedFiles([...selectedFiles, ...files]);
-};
-
-const handlemultipleUpload = async () => {
-  if (!excelFile) {
-    console.error('Please select an Excel file');
-    return;
-  }
-
-  if (uploadData.length === 0) {
-    console.error('No data found in the Excel file');
-    return;
-  }
-
-  try {
-    const uploadDataWithResponses = [];
-    const studentAddressList=[];
-    for (const data of uploadData) {
-      const file = selectedFiles.find((file) => file.name === data.fileName); // Find file by name
-      
-      if (file) {
-        const formData = new FormData();
-        const id = uuid();
-        formData.append('certificate', file);
-        formData.append('selectedUUID', id); // Include the selectedUUID in the formData
-        
-        const response = await axios.post('http://localhost:5000/issue', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      
-        uploadDataWithResponses.push([id, response.data.cid]);
-        studentAddressList.push(data.studentAddress);
-        console.log("Uploaded for",id,data.studentAddress,response.data);
-      } else {
-        console.error(`File not found for ${data.studentAddress}`);
-      }
-      
+    } catch (error) {
+      console.error('Error UniversityAdded:', error.reason);
+      toast.error('Error registering university', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+      // Handle the error here
     }
-    uploadDocumentnVerify(uploadDataWithResponses,studentAddressList,uploadDataWithResponses.length);
-  } catch (error) {
-    console.error('Error occurred during upload:', error);
   }
-};
-async function uploadDocumentnVerify(data,studentAddressList,count) {
-  try {
-    console.log("data:",data,"studentaddress:",studentAddressList," count: ",count);
-    const transaction = await contract.uploadDocumentnVerify(data,studentAddressList,count,{ from: account });
-    await transaction.wait();
-    
-    console.log('Document upload n Verifying successfully:', transaction);
+
+  async function checkUniversity() {
+    try {
+
+      // Call the smart contract function
+      const transaction = await contract.checkUniversity(account, { from: account });
+
+      console.log('university status:', transaction);
+      setisUniversityVerified(transaction);
+
+    } catch (error) {
+      console.error('Error checking university:', error.reason);
+      // Handle the error here
+    }
+  }
+
+  const getUniversityDocumentList = async () => {
+    try {
+      const transaction = await contract.getUniversityDocumentList({ from: account });
+      console.log('Response getUniversityDocumentList:', transaction); // Log the response
+
+      setUniversityDocumentlist(transaction);
+    } catch (error) {
+      console.error('Error fetching documents:', error.reason);
+    }
+  };
+
+  async function viewDocument() {
+    window.location.href = `/CompanyPage?document=${selectedUUID}`;
+  }
 
 
-  } catch (error) {
-    
-    console.error('Error upload n verifying document:',error);
-    // Handle the error here
+  const getDocumentCompanyList = async (uuid) => {
+    try {
+      if (!uuid) {
+        setDocumentCompanylist([]);
+        return;
+      };
+      const transaction = await contract.getDocumentCompanyList(uuid, { from: account });
+      console.log('Response getDocumentCompanyList:', transaction); // Log the response
+
+      setDocumentCompanylist(transaction);
+    } catch (error) {
+      console.error('Error fetching DocumentCompanyList:', error.reason);
+    }
+  };
+
+  useEffect(() => {
+    setDocumentDetails([]);
+    const fetchData = async () => {
+      const collectedData = [];
+      for (const uuid of universityDocumentlist) {
+        const data = await getDocumentDetails(uuid);
+        collectedData.push(data);
+      }
+      setDocumentDetails(collectedData);
+    };
+
+    fetchData();
+  }, [universityDocumentlist]);
+
+
+  const getDocumentDetails = async (uuid) => {
+    try {
+      if (!uuid) {
+
+        return;
+      };
+      const transaction = await contract.getDocumentDetails(uuid, { from: account });
+      const arr = [].concat(...transaction);
+      arr.push(uuid);
+      arr.splice(3, 1);
+      [arr[0], arr[1], arr[2], arr[3]] = [arr[3], arr[2], arr[0], arr[1]];
+
+      console.log('Response getDocumentDetails:', arr);
+      return arr;
+    } catch (error) {
+      console.error('Error fetching DocumentCompanyList:', error.reason);
+    }
+  };
+
+
+
+  //multiple file uplaod//
+
+  const handleExcelFileChange = useCallback((event) => {
+    setSelectedFiles([]);
+    const file = event[0];
+    setExcelFile(file);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+
+      const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
+      const worksheet = workbook.Sheets[sheetName];
+
+      const excelData = XLSX.utils.sheet_to_json(worksheet);
+      setUploadData(excelData);
+      console.log("data: ", excelData);
+    };
+    reader.readAsArrayBuffer(file);
+  }, []);
+
+  const handleFilesChange = useCallback((event) => {
+    const files = event;
+    setSelectedFiles([...selectedFiles, ...files]);
+  }, []);
+
+  const handlemultipleUpload = async () => {
+
+    setTransaction(null);
+    setIpfsData(null);
+    setSelectedUUID('');
+    if (!excelFile) {
+      console.error('Please select an Excel file');
+      return;
+    }
+
+    if (uploadData.length === 0) {
+      console.error('No data found in the Excel file');
+      return;
+    }
+
+    try {
+      const uploadDataWithResponses = [];
+      const studentAddressList = [];
+      for (const data of uploadData) {
+        const file = selectedFiles.find((file) => file.name === data.fileName); // Find file by name
+
+        if (file) {
+          const formData = new FormData();
+          const id = uuid();
+          formData.append('certificate', file);
+          formData.append('selectedUUID', id); // Include the selectedUUID in the formData
+
+          const response = await axios.post('http://localhost:5000/issue', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+
+          uploadDataWithResponses.push([id, response.data.cid]);
+          studentAddressList.push(data.studentAddress);
+          console.log("Uploaded for", id, data.studentAddress, response.data);
+        } else {
+          console.error(`File: ${data.fileName} not found for student: ${data.studentAddress}`);
+          toast.error(`File: ${data.fileName} not found for student: ${data.studentAddress}`, {
+            icon:IoMdCloseCircle,
+            onOpen: () => {
+                playToastSound(); // Play the sound when the toast opens
+              },
+          });
+        }
+
+      }
+      if (uploadDataWithResponses.length > 0 && studentAddressList.length > 0)
+        uploadDocumentnVerify(uploadDataWithResponses, studentAddressList, uploadDataWithResponses.length);
+    } catch (error) {
+      console.error('Error occurred during upload:', error);
+    }
+  };
+  async function uploadDocumentnVerify(data, studentAddressList, count) {
+    try {
+      console.log("data:", data, "studentaddress:", studentAddressList, " count: ", count);
+      const transaction = await contract.uploadDocumentnVerify(data, studentAddressList, count, { from: account });
+      await transaction.wait();
+      setTransaction(transaction);
+      console.log('Document upload n Verifying successfully:', transaction);
+
+      getUniversityDocumentList();
+      toast.success(' Document verified Successfully', {
+        icon:MdOutlineVerified,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+    } catch (error) {
+      toast.error('Error uploading & verifying ', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+      console.error('Error upload n verifying document:', error);
+      // Handle the error here
+    }
   }
-}
 
   return (
-    <div>
-        <br/>
-      <h5>Account:{account}</h5>
-      <h3>Add University</h3>
-      <button onClick={addUniversityfn}>Add university</button><br></br>
-      <button onClick={checkUniversity}>check University</button>
 
-     <div>
-        <label>select document:</label>
-        <select onChange={handleDocumentChange} value={selectedUUID}>
-          <option value="">Select document</option>
-          {universityDocumentlist.map((ipfs, index) => (
-            <option key={index} value={ipfs}>
-              {ipfs}
-            </option>
-          ))}
-        </select>
-        <button onClick={viewDocument}>view Document</button>
+    <Box>
+   
 
-      </div>
+      <SimpleGrid
+        columns={{ base: 1, md: 2, lg: 2, "2xl": 6 }}
+        gap='20px'
+        mb='20px'>
+        <MiniStatistics
+          startContent={
+            <IconBox
+              w='40px'
+              h='40px'
+              bg={boxBg}
+              icon={
+                <Icon w='20px' h='20px' as={FaRegAddressBook} color={uploadColor} />
+              }
+            />
+          }
+          name='Account'
+          value={account}
+        />
+          <Flex
+          borderRadius="20px"
+          p='4'
+          bg={cardbg}
+          backgroundClip="border-box"
+          
+          alignItems='center' >
+             <IconBox
+              w='40px'
+              h='40px'
+              bg={boxBg}
+              icon={
+                <Icon w='20px' h='20px' as={FaUniversity} color={uploadColor} />
+              }
+            />
+            <Text
+              color={textColor}
+              fontSize='22px'
+              fontWeight='500'
+              lineHeight='100%'
+              alignSelf='center'
+              ml='4'
+            >
+              {"University Status"}
+            </Text>
+            <IconBox ml='2'
+              w='30px'
+              h='30px'
+              bg={boxBg}
+              icon={<Icon
+                w='20px'
+                h='20px'
+                as={isUniversityVerified ? MdOutlineVerified : MdCancel}
+                color={isUniversityVerified ? uploadColor : 'red'}
+              />}
+            />
+            {!isUniversityVerified &&
+            <Button 
+            ml='auto'
+              onClick={addUniversityfn}
+              w='140px'
+              mt={{ base: "0px", "2xl": "auto" }}
+              variant='brand'
+              fontWeight='500'>
+              Register
+            </Button> }
+
+          </Flex>
+          
 
 
-      
-      <input type="file" accept=".pdf" onChange={handleFileChange} />
-     
-     
-      <button onClick={getHash}>Verify Document</button>
+      </SimpleGrid>
+
+      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
+
+        {/* FileUpload component */}
+        <FileUpload
+          onDrop={onDrop}
+          file={file}
+          heading={"Verify Document"}
+          selectLabel={"Select Document"}
+          handleSelectChange={handleDocumentChange}
+          selectedValue={selectedUUID}
+          selectList={universityDocumentlist}
+          handleBtn1={getHash}
+          btn1Text={"Verify"}
+          handleBtn2={getHash2}
+          btn2Text={"Un-Verify"}
+
+        />
 
 
-     <br></br><br></br>
-      
-      <button onClick={getHash2}>unVerify Document</button>
-      <br></br><br></br>
-      <div id="statusdiv" style={{ display: 'none' }}> 
-     
-       <p>new IPFS Hash: {newcid}</p>
-       <a target='_blank' href={pdfUrl}>View uploaded document</a>
-      </div>
+
+        <TransactionCard uuid={selectedUUID} Transaction={Transaction} ipfsData={ipfsData} />
+
+      </SimpleGrid>
+
+      {/*multiple FileUpload component */}
+      <Flex
+        borderRadius="20px"
+        mb='20px'
+        bg={cardbg}
+        backgroundClip="border-box"
+        gap='20px'
+      >
+
+        <FileUpload
+          onDrop={handleExcelFileChange}
+          file={excelFile}
+          heading={"Multiple Document Upload & Verify"}
+          handleBtn1={handlemultipleUpload}
+          btn1Text={"Upload & Verify"}
+
+          uploadLabel='Only Excel File allowed'
+          width={"50%"}
+        />
+        <FileUpload
+          onDrop={handleFilesChange} file={selectedFiles}
+          width={"50%"}
+        />
+      </Flex>
 
 
-      
+      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
+        {/* add or remove company */}
+        <CompanyManage
+          handleDocumentChange={handleDocumentChange}
+          uuid={selectedUUID}
+          Documentlist={universityDocumentlist}
 
-      <div>
-        <label>Add or Remove Company:</label>
-        <select onChange={handleCompanyChange} value={selectedCompany}>
-          <option value="">Select Company</option>
-          {companyAddresses.map((address, index) => (
-            <option key={index} value={address}>
-              {address}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <button onClick={includeCompany}>include Company</button>
-      <button onClick={removeCompany}>remove Company</button>
-     <h4>Upload Multiple Files</h4>
-      <div>
-      <input type="file" accept=".xlsx, .xls" onChange={handleExcelFileChange} />
-      <input type="file" accept=".pdf" multiple onChange={handleFilesChange} />
-      <button onClick={handlemultipleUpload}>Upload n verify</button>
-      </div>
-     
+          handleCompanyChange={handleCompanyChange}
+          selectedCompany={selectedCompany}
+          companyAddresses={companyAddresses}
+          includeCompany={includeCompany}
+          removeCompany={removeCompany}
+        />
 
-    </div>
+
+
+        {/* Document Companies List */}
+        <TabelCard data={[DocumentCompanylist]} headers={["S.N", "Companies"]}
+          heading={"Document Companies List"} searchId={0} searchLabel={"Search Company"} />
+
+      </SimpleGrid>
+
+
+
+
+
+      <SimpleGrid columns={{ base: 1, md: 1, xl: 1 }} gap='20px' mb='20px' >
+        {/* Company Document List */}
+
+        <TabelCard data={DocumentDetails} headers={["S.N", "Document", "Student", "IPFS CID", "Verified"]}
+          heading={"Company Document List"} searchId={1} searchLabel={"Search Document"}
+        />
+
+
+      </SimpleGrid>
+
+
+
+
+
+
+
+
+    </Box>
   );
 }
 

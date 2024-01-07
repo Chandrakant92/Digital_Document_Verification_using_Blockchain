@@ -68,6 +68,25 @@ authRouter.post('/login', async (req, res) => {
   }
 });
 
+authRouter.post('/profile', async (req, res) => {
+  try {
+    const {role, email,address } = req.body;
+    
+    if (!role||  !email ||!address ) {
+      return res.status(400).json({ error: 'fields are required' });
+    }
+    const user = await User.findOne({role, email,address });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    res.status(200).json({ message:"Profile fetched successfully",name:user.name,roleid:user.roleid });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -86,7 +105,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Protected route example
-authRouter.get('/profile', verifyToken, (req, res) => {
+authRouter.get('/JwtProfile', verifyToken, (req, res) => {
   res.json({ message: 'Protected route accessed successfully', user: req.user });
 });
 

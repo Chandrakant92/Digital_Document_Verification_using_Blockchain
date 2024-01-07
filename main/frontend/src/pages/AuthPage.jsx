@@ -76,7 +76,7 @@ const AuthPage = () => {
                     await login(data.role, { email: data.email,password: data.password, address: data.address });
                     localStorage.setItem(data.role, JSON.stringify({ email: data.email,password: data.password, address: data.address }));
                 }
-           
+                
                 toast.success(` ${isLogin ? 'Login' : 'Account Created'} Successfully`, {
                     icon:IoMdLogIn,
                     onOpen: () => {

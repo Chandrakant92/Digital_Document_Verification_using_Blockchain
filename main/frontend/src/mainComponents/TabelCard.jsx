@@ -117,6 +117,15 @@ const TabelCard = ({data,headers,heading,searchLabel,searchId}) => {
     );
   }, []);
 
+  const onSelectionChanged = useCallback(() => {
+    const selectedRows = gridRef.current.api.getSelectedRows();
+      if(selectedRows[0] && selectedRows[0].field_3){
+        const url = `http://localhost:8080/ipfs/${selectedRows[0].field_3}`;
+        window.open(url, '_blank');
+      } 
+  }, []);
+
+
   // Container: Defines the grid's theme & dimensions.
   return (
     <Stack
@@ -159,6 +168,9 @@ const TabelCard = ({data,headers,heading,searchLabel,searchId}) => {
       >
         <AgGridReact ref={gridRef} rowData={rowData} columnDefs={colDefs} 
         autoSizeStrategy={autoSizeStrategy}
+        rowSelection={'single'}
+        onSelectionChanged={onSelectionChanged}
+     
        
         />
       </div>

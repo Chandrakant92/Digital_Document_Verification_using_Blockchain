@@ -242,7 +242,7 @@ contract Contract {
        Document storage document = documentsById[uniqueId];
         require(document.owner!= address(0), "Document does not exist");
          
-          require(document.owner==msg.sender,"The user is not authorized to access document" );
+          require(document.owner==msg.sender||document.universityAddress==msg.sender,"The user is not authorized to access document" );
      
         mapping(address => bool) storage companiesm = AccessCompanyMapping[uniqueId];
     

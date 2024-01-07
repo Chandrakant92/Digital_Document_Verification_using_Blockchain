@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Button, Select, SimpleGrid, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 
 const CompanyManage = ({
-    handleDocumentChange,uuid,studentDocumentlist,
+    handleDocumentChange,uuid,Documentlist,
     handleCompanyChange,selectedCompany,companyAddresses,
     includeCompany,removeCompany
 }) => {
@@ -30,7 +30,7 @@ const CompanyManage = ({
 
             <Select variant='auth' label='Select Document' onChange={handleDocumentChange} value={uuid}>
                 <option value="">Select Document</option>
-                {studentDocumentlist.map((ipfs, index) => (
+                {Documentlist.map((ipfs, index) => (
                     <option key={index} value={ipfs}>
                         {ipfs}
                     </option>

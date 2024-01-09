@@ -9,7 +9,8 @@ const FileUpload = ({
   selectLabel, handleSelectChange, selectedValue, selectList,
   handleBtn1, btn1Text,
   handleBtn2, btn2Text,
-  twobtn = false, isSelect = true, zerobtn = false,uploadLabel='Only PDF file is allowed',width
+  uploadLabel='Only PDF file is allowed',width,
+  inputText,inputValue,handleInputChange,
 }) => {
   // handleUniversityChange,selectedUniversity,universityAddresses,
   // handleUpload
@@ -37,6 +38,21 @@ const FileUpload = ({
         lineHeight='100%'>
         {heading}
       </Text>
+      {inputText &&
+        <Input
+        type="text"
+        placeholder={inputText}
+        value={inputValue}
+        onChange={handleInputChange}
+        variant='auth'
+        isRequired='true'
+        h='44px'
+        maxh='44px'
+        fontSize='sm'
+        ms={{ base: "0px", md: "0px" }}
+        size='lg'
+      />
+      }
 
       {selectLabel &&
         <Select variant='auth' label={selectLabel} onChange={handleSelectChange} value={selectedValue}>

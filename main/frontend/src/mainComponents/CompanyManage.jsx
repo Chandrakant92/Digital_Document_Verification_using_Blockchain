@@ -4,7 +4,10 @@ import { Box, Button, Select, SimpleGrid, Stack, Text, useColorModeValue } from 
 const CompanyManage = ({
     handleDocumentChange,uuid,Documentlist,
     handleCompanyChange,selectedCompany,companyAddresses,
-    includeCompany,removeCompany
+    includeCompany,removeCompany,
+    btn1text="Include company",btn2text="Remove Company",
+    select1label="Select Document", oneSelect=false,
+    heading="Add or Remove Company",
 }) => {
 
     const cardbg = useColorModeValue('#ffffff', 'navy.800');
@@ -25,18 +28,19 @@ const CompanyManage = ({
                 fontSize='22px'
                 fontWeight='500'
                 lineHeight='100%'>
-                Add or Remove Companies
+               {heading}
             </Text>
 
-            <Select variant='auth' label='Select Document' onChange={handleDocumentChange} value={uuid}>
-                <option value="">Select Document</option>
+            <Select variant='auth' label={select1label} onChange={handleDocumentChange} value={uuid}>
+                <option value="">{select1label}</option>
                 {Documentlist.map((ipfs, index) => (
                     <option key={index} value={ipfs}>
                         {ipfs}
                     </option>
                 ))}
             </Select>
-            <Select variant='auth' label='Select Company' onChange={handleCompanyChange} value={selectedCompany}>
+          {!oneSelect &&
+            <Select variant='auth' label="Select Company" onChange={handleCompanyChange} value={selectedCompany}>
                 <option value="">Select Company</option>
                 {companyAddresses.map((address, index) => (
                     <option key={index} value={address}>
@@ -44,20 +48,21 @@ const CompanyManage = ({
                     </option>
                 ))}
             </Select>
+          }
             <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap={{ base: '10%', }} >
                 <Button
                     onClick={includeCompany}
 
                     variant='brand'
                     fontWeight='500'>
-                    Include Company
+                    {btn1text}
                 </Button>
                 <Button
                     onClick={removeCompany}
 
                     variant='brand'
                     fontWeight='500'>
-                    Remove Company
+                    {btn2text}
                 </Button>
             </SimpleGrid>
         </Stack>

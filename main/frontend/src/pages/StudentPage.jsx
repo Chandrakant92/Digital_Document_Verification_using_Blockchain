@@ -100,7 +100,12 @@ function StudentPage() {
 
     } catch (error) {
       console.error(error);
-      
+      toast.error('Error uploading document', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
     }
 
 

@@ -11,8 +11,10 @@ export const useMetaMaskContext = () => {
 export const MetaMaskProvider = ({ children }) => {
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState('');
+  const [accounts, setAccounts] = useState('');
+  
   const [provider, setProvider] = useState();
-
+  
   useEffect(() => {
     async function loadMetaMaskData() {
       try {
@@ -27,9 +29,10 @@ export const MetaMaskProvider = ({ children }) => {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
           const currentAccount = accounts[0];
           setAccount(currentAccount);
-
+          setAccounts(accounts);
           window.ethereum.on('accountsChanged', (newAccounts) => {
             setAccount(newAccounts[0]);
+            setAccounts(newAccounts);
           });
         }
       } catch (error) {
@@ -41,7 +44,7 @@ export const MetaMaskProvider = ({ children }) => {
   }, []);
 
   return (
-    <MetaMaskContext.Provider value={{ contract, account,provider }}>
+    <MetaMaskContext.Provider value={{ contract, accounts,account,setAccount,provider }}>
       {children}
     </MetaMaskContext.Provider>
   );

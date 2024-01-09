@@ -1,18 +1,83 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useMetaMaskContext } from '../context/MetaMaskContext';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+
+
+import MiniStatistics from '../components/card/MiniStatistics';
+import IconBox from '../components/icons/IconBox';
+import { Box, Button, Card, Checkbox, CheckboxGroup, Flex, Icon, IconButton, Input, Select, SimpleGrid, Stack, useCheckboxGroup, useColorModeValue } from '@chakra-ui/react';
+import { FaRegAddressBook } from "react-icons/fa";
+import { useDropzone } from 'react-dropzone';
+import { Text } from '@chakra-ui/react';
+
+import { useMemo } from 'react';
+import { MdOutlineVerified } from "react-icons/md";
+
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+} from '@chakra-ui/react'
+
+
+import {
+  MdAddTask,
+  MdAttachMoney,
+  MdBarChart,
+  MdFileCopy,
+} from "react-icons/md";
+
+
+import { FaBuilding } from "react-icons/fa";
+import { MdCheckBox, MdDragIndicator } from "react-icons/md";
+import { MdUpload } from "react-icons/md";
+
+import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
+import { TabelCard } from '../mainComponents/TabelCard';
+import TransactionCard from '../mainComponents/TransactionCard';
+import CompanyManage from '../mainComponents/CompanyManage';
+import FileUpload from '../mainComponents/FileUpload';
+
+
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { IoMdCloseCircle } from "react-icons/io";
+import playToastSound from '../mainComponents/ToastSound';
+
 
 // Create a Web3 instance using the current Ethereum provider (MetaMask)
 function CompanyPage() {
   const [file, setFile] = useState(null);
-  const [cid, setCid] = useState(null);
-  const [status, setStatus] = useState([]);
-  const [QrCodeText, setQrCodeText] = useState('');
+  const [status, setStatus] = useState('');   //check n verify status//
+  const [QrCodeText, setQrCodeText] = useState('');  //input box and path qr txt//
 
   const { contract, account } = useMetaMaskContext();
 
   const location = useLocation();
+
+  const [isCompanyVerified,setIsCompanyVerified]=useState(true);
+
+
+  const[DocumentDetails,setDocumentDetails]=useState(null); //check status//
+
+
+  
+  const cardbg = useColorModeValue('#ffffff', 'navy.800');
+  const brandColor = useColorModeValue("brand", "white");
+  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const bg = useColorModeValue("gray.100", "navy.700");
+  const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
+  const uploadColor = useColorModeValue("brand.500", "white");
+  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const iconColor = useColorModeValue("secondaryGray.500", "white");
+
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -26,26 +91,27 @@ function CompanyPage() {
 
 
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    console.log(e.target.files[0]);
-    setCid(null);
-    setStatus([]);
-  };
+  const handleFileChange = useCallback((acceptedFiles) => {
+    setFile(acceptedFiles[0]);
+  
+  },[]);
+
+
 
   const getHash = async () => {
+    setStatus('');
+    setDocumentDetails(null);
+   
     const formData = new FormData();
     formData.append('certificate', file);
 
     try {
+      if(!QrCodeText) return;
       const response = await axios.post('http://localhost:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      console.log(response.data);
-
-      setCid(response.data.cid);
-
+     // console.log(response.data);   //uuid//cid
       console.log("uuid", QrCodeText, "hash", response.data.cid);
 
       checkStatusnVerify(response.data.cid);
@@ -57,22 +123,8 @@ function CompanyPage() {
 
   };
 
-  // Define your document upload function
-  async function checkStatus() {
-    try {
-
-      // Call the smart contract function
-      const transaction = await contract.checkStatus(QrCodeText, { from: account });
-      setStatus(transaction);
-      console.log('Document is Verified:', transaction);
-
-
-    } catch (error) {
-      console.error('Error checking verification status:', error.reason);
-      // Handle the error here
-    }
-  }
   async function checkStatusnVerify(_cid) {
+   
     try {
 
 
@@ -80,11 +132,61 @@ function CompanyPage() {
       console.log("uuid", QrCodeText, "hash", _cid);
 
       const transaction = await contract.checknverify(QrCodeText, _cid, { from: account });
-
+      setStatus(`Document is Valid${transaction ? ' & Verified' : ' but Not Verified'}`);
       console.log('Document is Verified:', transaction);
 
+      if(transaction) checkStatus();
+      
+
+      toast.success(`Document is Valid${transaction ? ' & Verified' : ' but Not Verified'}`, {
+        icon:MdFileCopy,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+
     } catch (error) {
+      setStatus("Document is Invalid or Fake");
       console.error('Error checking verification status:', error.reason);
+      toast.error('Document is Invalid or Fake', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
+      // Handle the error here
+    }
+  }
+
+  
+  // Define your document upload function
+  async function checkStatus() {
+    try {
+      setDocumentDetails(null);
+      if (!QrCodeText) {
+
+        return;
+      };
+      // Call the smart contract function
+      const transaction = await contract.getDocumentDetails(QrCodeText, { from: account });
+      const arr = [].concat(...transaction);
+      arr.push(QrCodeText);
+      //ipfs//verify//student//university//doc//
+      [arr[0], arr[1], arr[2], arr[3],arr[4]] = [arr[4], arr[2], arr[3], arr[0],arr[1]];
+      
+      setDocumentDetails(arr);
+      
+      console.log('Document details:', arr);
+      
+
+    } catch (error) {
+      console.error('Error checking document details:', error.reason);
+      toast.error('Error checking document details', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
       // Handle the error here
     }
   }
@@ -97,11 +199,23 @@ function CompanyPage() {
       const transaction = await contract.registerCompany({ from: account });
       await transaction.wait();
       console.log('Company added successfully:', transaction);
-
+    
+      toast.success(`Company added successfully`, {
+        icon:FaBuilding,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
 
 
     } catch (error) {
       console.error('Error registring company:', error.reason);
+      toast.error('Error registring company', {
+        icon:IoMdCloseCircle,
+        onOpen: () => {
+            playToastSound(); // Play the sound when the toast opens
+          },
+      });
       // Handle the error here
     }
   }
@@ -112,6 +226,7 @@ function CompanyPage() {
 
       // Call the smart contract function
       const transaction = await contract.checkCompany(account, { from: account });
+      setIsCompanyVerified(transaction);
 
       console.log('Company status:', transaction);
 
@@ -126,40 +241,202 @@ function CompanyPage() {
     setQrCodeText(event.target.value);
   };
 
+  useEffect(() => {
+    // Check if contract is not null
+    if (contract !== null) {
+      checkCompany();
+     
+    }
+  }, [account]); 
+
+
+
+  const cellStyle = {
+    wordBreak: 'break-all',
+    padding: '5px',
+    
+  };
+
+
 
   return (
-    <div>
-      <br />
-      <h5>Account:{account}</h5>
-      <h3>Register Company</h3>
-      <button onClick={addCompanyfn}>Register Company</button><br></br>
-      <button onClick={checkCompany}>check company</button>
 
-      <input type="file" accept=".pdf" onChange={handleFileChange} />
-      {/* <button onClick={getHash}>Generate Hash</button>
-   */}
-      {cid && <p>IPFS Hash: {cid}</p>}
+    <Box>
+   
+
+      <SimpleGrid
+        columns={{ base: 1, md: 2, lg: 2, "2xl": 6 }}
+        gap='20px'
+        mb='20px'>
+        <MiniStatistics
+          startContent={
+            <IconBox
+              w='40px'
+              h='40px'
+              bg={boxBg}
+              icon={
+                <Icon w='20px' h='20px' as={FaRegAddressBook} color={uploadColor} />
+              }
+            />
+          }
+          name='Account'
+          value={account}
+        />
+          <Flex
+          borderRadius="20px"
+          p='4'
+          bg={cardbg}
+          backgroundClip="border-box"
+          
+          alignItems='center' >
+             <IconBox
+              w='40px'
+              h='40px'
+              bg={boxBg}
+              icon={
+                <Icon w='20px' h='20px' as={FaBuilding} color={uploadColor} />
+              }
+            />
+            <Text
+              color={textColor}
+              fontSize='22px'
+              fontWeight='500'
+              lineHeight='100%'
+              alignSelf='center'
+              ml='4'
+            >
+              {"Company Status"}
+            </Text>
+            <IconBox ml='2'
+              w='30px'
+              h='30px'
+              bg={boxBg}
+              icon={<Icon
+                w='20px'
+                h='20px'
+                as={isCompanyVerified ? MdOutlineVerified : MdCancel}
+                color={isCompanyVerified ? uploadColor : 'red'}
+              />}
+            />
+            {!isCompanyVerified &&
+            <Button 
+            ml='auto'
+              onClick={addCompanyfn}
+              w='140px'
+              mt={{ base: "0px", "2xl": "auto" }}
+              variant='brand'
+              fontWeight='500'>
+              Register
+            </Button> }
+
+          </Flex>
+          
 
 
-      <input
-        type="text"
-        placeholder="document id"
-        value={QrCodeText}
-        onChange={handleChange}
+      </SimpleGrid>
 
-      />
+      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
 
-      <button onClick={getHash}>check verification status n verify</button>
-      <button onClick={checkStatus}>check verification status</button>
+        {/* FileUpload component */}
+        <FileUpload
+          onDrop={handleFileChange}
+          file={file}
+          heading={"Check & Verify Document"}
+          handleBtn1={getHash}
+          btn1Text={"Check & Verify"}
+          handleBtn2={checkStatus}
+          btn2Text={"checkStatus"}
 
-      {status[0] && <a target='_blank' href={`http://localhost:8080/ipfs/${status[1]}`}>View uploaded document</a>}
+          inputText={"Document Id"}
+
+          inputValue={QrCodeText}
+          handleInputChange={handleChange}
+
+         />
+
+     <Stack borderRadius="20px"
+      p='7'
+      bg={cardbg}
+      backgroundClip="border-box"
+      spacing='5'
+     
+    >
+      <Text 
+        mb='5'
+        color={textColor}
+        fontSize='22px'
+        fontWeight='500'
+        lineHeight='100%'>
+        Document Status
+      </Text>
+      {status && 
+      <Text 
+        color={textColor}
+        fontSize='18px'
+        fontWeight='500'
+        textAlign='center'
+        >
+       {status}
+      </Text>
+     }
+      {DocumentDetails && <>
+        <Box height='auto' borderWidth='1px' borderRadius='lg'>
+
+<Table >
+      <Tbody>
+        <Tr>
+          <Th >Document:</Th>
+          <Td style={cellStyle}>{DocumentDetails[0]}</Td>
+        </Tr>
+        <Tr>
+          <Th >Student:</Th>
+          <Td style={cellStyle}>{DocumentDetails[1]}</Td>
+        </Tr>
+        <Tr>
+          <Th >University:</Th>
+          <Td style={cellStyle}>{DocumentDetails[2]}</Td>
+        </Tr>
+        <Tr>
+          <Th >Ipfs Cid:</Th>
+          <Td style={cellStyle}>{DocumentDetails[3]}</Td>
+        </Tr>
+        <Tr>
+          <Th >Ipfs Link:</Th>
+          <Td style={cellStyle} color='blue'>
+            <a href={`http://localhost:8080/ipfs/${DocumentDetails[3]}`} target='_blank'>
+              {`http://localhost:8080/ipfs/${DocumentDetails[3]}`}
+            </a>
+          </Td>
+        </Tr>
+        <Tr>
+          <Th >Verified:</Th>
+          <Td style={cellStyle}>
+            {DocumentDetails[4] === 'true' ? (
+              <Icon  w='20px'
+              h='20px' as={MdOutlineVerified} color='green' />
+            ) : (
+              <Icon  w='20px'
+              h='20px' as={MdCancel} color='red' />
+            )}
+          </Td>
+        </Tr>
+      </Tbody>
+    </Table>
+    </Box>
+      </>
+      }
+      </Stack>
+
+      </SimpleGrid>
+
+    
 
 
 
 
 
-
-    </div>
+    
+    </Box>
   );
 }
 

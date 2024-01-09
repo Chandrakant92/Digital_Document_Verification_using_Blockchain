@@ -262,10 +262,10 @@ function UniversityPage() {
   useEffect(() => {
     // Check if contract is not null
     if (contract !== null) {
-
       getUniversityDocumentList();
       fetchCompanyAddresses();
       checkUniversity();
+     
     }
   }, [account]); // Add contract as a dependency
 

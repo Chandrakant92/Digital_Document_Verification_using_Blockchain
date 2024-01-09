@@ -51,7 +51,7 @@ const TabelCard = ({data,headers,heading,searchLabel,searchId}) => {
       const columnDefs = headers.map((header,index) => ({
         headerName: header,
         field: `field_${index}`,
-        
+        width:header==='S.N'?'80px':header==='Companies'?'300px':undefined,
         cellRenderer: header === 'Verified' ? verifiedCellRenderer : undefined,
       }));
 
@@ -63,7 +63,7 @@ const TabelCard = ({data,headers,heading,searchLabel,searchId}) => {
           rowObj[field] = item;
         });
       
-        rowObj[`field_0`] =  index; 
+        rowObj[`field_0`] =  index+1; 
       
         return rowObj;
       }

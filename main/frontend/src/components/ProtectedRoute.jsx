@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import { useMetaMaskContext } from '../context/MetaMaskContext';
+import InvalidAddres from '../mainComponents/InvalidAddres';
 
 const ProtectedRoute = ({ role, children }) => {
   const { account } = useMetaMaskContext();
@@ -39,7 +40,7 @@ const ProtectedRoute = ({ role, children }) => {
   if (!isLoggedIn(role)) {
     return  <Navigate to="/AuthPage/login" />; // Redirect to login if not authenticated
   } else if (!isValidAddress) {
-    return 'Invalid address';
+    return <InvalidAddres/>;
   } else {
     return children; // Render children if the user is authenticated and has a valid address
   }

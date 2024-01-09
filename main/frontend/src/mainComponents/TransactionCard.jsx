@@ -19,6 +19,12 @@ const TransactionCard = ({Transaction,ipfsData,uuid}) => {
     const cardbg = useColorModeValue('#ffffff', 'navy.800');
     const textColor = useColorModeValue("secondaryGray.900", "white");
  
+    const cellStyle = {
+      wordBreak: 'break-all',
+      padding: '5px',
+      
+    };
+  
 
   return (
    <>
@@ -38,49 +44,46 @@ spacing='0'
   Transaction Details
 </Text>
 {  Transaction  ?   
-<Box  borderWidth='1px' borderRadius='lg'>
-<TableContainer>
-<Table variant='simple' size='sm'>
+<Box height='auto' borderWidth='1px' borderRadius='lg'>
+
+<Table >
 <Tbody>
 {ipfsData || uuid ? (
   <Tr>
     <Th>Document:</Th>
-    <Td>{ipfsData ? ipfsData.uuid : uuid ? uuid : "not defined"}</Td>
+    <Td style={cellStyle}>{ipfsData ? ipfsData.uuid : uuid ? uuid : "not defined"}</Td>
   </Tr>
 ) : null}
 <Tr>
 <Th>TX: </Th>
-<Td> {Transaction.hash}</Td>
+<Td style={cellStyle}> {Transaction.hash}</Td>
 </Tr>
 <Tr>
 <Th>From: </Th>
-<Td>{Transaction.from}</Td>   
+<Td style={cellStyle}>{Transaction.from}</Td>   
 </Tr>
 <Tr>
 <Th>To: </Th>
-<Td>{Transaction.to}</Td>   
+<Td style={cellStyle}>{Transaction.to}</Td>   
 </Tr>
 <Tr>
 <Th>Nonce: </Th>
-<Td> {Transaction.nonce}</Td>   
+<Td style={cellStyle}> {Transaction.nonce}</Td>   
 </Tr>
-
-{ipfsData &&
+{ipfsData && 
 <>
 <Tr>
 <Th>IPFS CID: </Th>
-<Td>{ipfsData.cid}</Td>   
+<Td style={cellStyle}>{ipfsData.cid}</Td>   
 </Tr>
 <Tr>
 <Th>IPFS Link: </Th>
-<Td color={'blue'}><a href={ipfsData.ifpsLink} target='_blank'>{ipfsData.ifpsLink}</a></Td>   
+<Td color={'blue'}><a href={ipfsData.ifpsLink} target='_blank'> {`http://localhost:8080/ipfs/ipfs_cid`}</a></Td>   
 </Tr>
 </>
 }
-
 </Tbody>
 </Table>
-</TableContainer>
 </Box> :
 <Text 
 color={textColor}

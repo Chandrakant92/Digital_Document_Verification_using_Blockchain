@@ -110,7 +110,7 @@ function catchAsync(fn) {
 }
 // generate QR Code////////////////////
 async function generateQRCodePDF(text, pdfInputPath, pdfOutputPath) {
-    const link = `http://localhost:3000/CompanyPage?document=${text}`;
+    const link = `http://localhost:5173/CompanyPage?document=${text}`;
 
     const qrCode = await QRCode.toDataURL(link,
         { errorCorrectionLevel: 'H' });

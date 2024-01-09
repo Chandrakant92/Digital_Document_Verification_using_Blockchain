@@ -9,7 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 // Import your page components
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./mainComponents/ProtectedRoute";
 import AdminNavbar from "./components/Navbar/Navbar";
 
 // Chakra imports

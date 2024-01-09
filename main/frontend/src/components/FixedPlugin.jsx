@@ -13,27 +13,16 @@ export default function FixedPlugin(props) {
   return (
     <Button
       {...rest}
-     // h='60px'
-     // w='60px'
-     // zIndex='99'
-     // bg={navbarIcon}
-    //   position='fixed'
+    
       variant='no-effects'
-    //  left={ ""}
-    //  right={"35px"}
-    //  bottom='30px'
-    //  border='1px solid'
-     // borderColor='#6A53FF'
-     // borderRadius='50px'
+   
       onClick={toggleColorMode}
-     // display='flex'
+    
       p='0px'
-     // align='center'
-     // justify='center'
+    
       >
       <Icon
-       // h='24px'
-       // w='24px'
+      
         color={navbarIcon}
         as={colorMode === "light" ? IoMdMoon : IoMdSunny}
       />

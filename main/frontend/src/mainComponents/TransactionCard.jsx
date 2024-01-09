@@ -13,6 +13,17 @@ import {
     TableContainer,
   } from '@chakra-ui/react'
   
+import {
+  MdAddTask,
+  MdAttachMoney,
+  MdBarChart,
+  MdFileCopy,
+} from "react-icons/md";
+
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { IoMdCloseCircle } from "react-icons/io";
+
 const TransactionCard = ({Transaction,ipfsData,uuid}) => {
             
 
@@ -23,6 +34,21 @@ const TransactionCard = ({Transaction,ipfsData,uuid}) => {
       wordBreak: 'break-all',
       padding: '5px',
       
+    };
+    const handleCopyToClipboard = (text) => {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          // Notify the user or handle success if needed
+         // console.log('Text copied to clipboard:', text);
+         toast.success('Text copied to clipboard', {
+          icon:MdFileCopy,
+         
+        });
+        })
+        .catch((error) => {
+          // Handle error if clipboard write fails
+          console.error('Failed to copy text to clipboard:', error);
+        });
     };
   
 
@@ -51,30 +77,30 @@ spacing='0'
 {ipfsData || uuid ? (
   <Tr>
     <Th>Document:</Th>
-    <Td style={cellStyle}>{ipfsData ? ipfsData.uuid : uuid ? uuid : "not defined"}</Td>
+    <Td onClick={() => handleCopyToClipboard(ipfsData ? ipfsData.uuid : uuid)} style={cellStyle}>{ipfsData ? ipfsData.uuid : uuid ? uuid : "not defined"}</Td>
   </Tr>
 ) : null}
 <Tr>
 <Th>TX: </Th>
-<Td style={cellStyle}> {Transaction.hash}</Td>
+<Td onClick={() => handleCopyToClipboard(Transaction.hash)} style={cellStyle}> {Transaction.hash}</Td>
 </Tr>
 <Tr>
 <Th>From: </Th>
-<Td style={cellStyle}>{Transaction.from}</Td>   
+<Td onClick={() => handleCopyToClipboard(Transaction.from)} style={cellStyle}>{Transaction.from}</Td>   
 </Tr>
 <Tr>
 <Th>To: </Th>
-<Td style={cellStyle}>{Transaction.to}</Td>   
+<Td onClick={() => handleCopyToClipboard(Transaction.to)} style={cellStyle}>{Transaction.to}</Td>   
 </Tr>
 <Tr>
 <Th>Nonce: </Th>
-<Td style={cellStyle}> {Transaction.nonce}</Td>   
+<Td onClick={() => handleCopyToClipboard(Transaction.nonce)} style={cellStyle}> {Transaction.nonce}</Td>   
 </Tr>
 {ipfsData && 
 <>
 <Tr>
 <Th>IPFS CID: </Th>
-<Td style={cellStyle}>{ipfsData.cid}</Td>   
+<Td onClick={() => handleCopyToClipboard(ipfsData.cid)} style={cellStyle}>{ipfsData.cid}</Td>   
 </Tr>
 <Tr>
 <Th>IPFS Link: </Th>

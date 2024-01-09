@@ -254,9 +254,25 @@ function CompanyPage() {
   const cellStyle = {
     wordBreak: 'break-all',
     padding: '5px',
-    
+    cursor: 'pointer', // Adding a pointer cursor to indicate clickable content
+ 
   };
 
+  const handleCopyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        // Notify the user or handle success if needed
+       // console.log('Text copied to clipboard:', text);
+        toast.success('Text copied to clipboard', {
+          icon:MdFileCopy,
+         
+        });
+      })
+      .catch((error) => {
+        // Handle error if clipboard write fails
+        console.error('Failed to copy text to clipboard:', error);
+      });
+  };
 
 
   return (
@@ -353,7 +369,7 @@ function CompanyPage() {
           handleInputChange={handleChange}
 
          />
-
+  {status||DocumentDetails?
      <Stack borderRadius="20px"
       p='7'
       bg={cardbg}
@@ -386,19 +402,19 @@ function CompanyPage() {
       <Tbody>
         <Tr>
           <Th >Document:</Th>
-          <Td style={cellStyle}>{DocumentDetails[0]}</Td>
+          <Td style={cellStyle} onClick={() => handleCopyToClipboard(DocumentDetails[0])}>{DocumentDetails[0]}</Td>
         </Tr>
         <Tr>
           <Th >Student:</Th>
-          <Td style={cellStyle}>{DocumentDetails[1]}</Td>
+          <Td style={cellStyle} onClick={() => handleCopyToClipboard(DocumentDetails[1])}>{DocumentDetails[1]}</Td>
         </Tr>
         <Tr>
           <Th >University:</Th>
-          <Td style={cellStyle}>{DocumentDetails[2]}</Td>
+          <Td style={cellStyle} onClick={() => handleCopyToClipboard(DocumentDetails[2])}>{DocumentDetails[2]}</Td>
         </Tr>
         <Tr>
           <Th >Ipfs Cid:</Th>
-          <Td style={cellStyle}>{DocumentDetails[3]}</Td>
+          <Td style={cellStyle} onClick={() => handleCopyToClipboard(DocumentDetails[3])}>{DocumentDetails[3]}</Td>
         </Tr>
         <Tr>
           <Th >Ipfs Link:</Th>
@@ -426,6 +442,7 @@ function CompanyPage() {
       </>
       }
       </Stack>
+      :null}
 
       </SimpleGrid>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import { useMetaMaskContext } from '../context/MetaMaskContext';
-import InvalidAddres from '../mainComponents/InvalidAddres';
+import InvalidAddres from './InvalidAddres';
 
 const ProtectedRoute = ({ role, children }) => {
   const { account } = useMetaMaskContext();

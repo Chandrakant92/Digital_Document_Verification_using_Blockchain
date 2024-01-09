@@ -76,8 +76,6 @@ export function SidebarLinks(props) {
     ));
   };
   
-  // Rest of your SidebarLinks component remains the same
-  
   //  BRAND
   return createLinks(routes);
 }

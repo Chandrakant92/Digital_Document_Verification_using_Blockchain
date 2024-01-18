@@ -71,13 +71,13 @@ const routes = [
     icon: <Icon as={MdLock} width='20px' height='20px' color='inherit' />,
     component: <AuthPage/>,
   },
-  // {
-  //   name: "Test Page",
+  {
+    name: "Test Page",
    
-  //   path: "/Test",
-  //   icon: <Icon as={GrTest} width='20px' height='20px' color='inherit' />,
-  //   component: <Test/>,
-  // },
+    path: "/Test",
+    icon: <Icon as={GrTest} width='20px' height='20px' color='inherit' />,
+    component: <Test/>,
+  },
   
   
 ];

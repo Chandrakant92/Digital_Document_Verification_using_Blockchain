@@ -145,8 +145,9 @@ export default function HomePage() {
         </Box>
 
       </Flex>
+      
+      {/* second comntainer */}   
 
-      {/* second comntainer */}
       <Flex mb="20px" bg={cardbg} backgroundClip="border-box" p='7' borderRadius={"20px"}>
         <ThreeDModelCanvas modelname="student" scale={0.4} pos={[0, -2, 0]} />
         <RoleInfoBox icon={PiStudentFill} title="Student" points={studentPoints} pl="10" />

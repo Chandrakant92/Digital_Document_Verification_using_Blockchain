@@ -14,7 +14,7 @@
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@hypertheme-editor/chakra-ui": "^0.1.6-rc.0",
-    "@react-three/drei": "^9.96.0",
+    "@react-three/drei": "^9.96.1",
     "@react-three/fiber": "^8.15.14",
     "@types/three": "^0.160.0",
     "ag-grid-react": "^31.0.1",

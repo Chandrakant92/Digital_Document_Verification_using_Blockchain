@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { SketchPicker } from 'react-color';
 import { exportComponentAsPNG } from 'react-component-export-image';
 import { Box, Button, Flex, Image, Input, Stack, Text } from '@chakra-ui/react';
 

@@ -22,7 +22,7 @@ import IconBox from "../components/icons/IconBox";
 import RoleInfoBox from "../mainComponents/RoleInfoBox";
 import ThreeDModelCanvas from "../mainComponents/ThreeDModelCanvas";
 import UniversalModel from "../mainComponents/UniversalModel";
-import FlowChart from "../mainComponents/FlowChart";
+import FlowChart from "../mainComponents/Flowchart/FlowChart";
 
 
 

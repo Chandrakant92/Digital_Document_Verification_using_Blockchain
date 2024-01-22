@@ -35,29 +35,28 @@ or they can upload the document submitted by the student, then ifps will return 
 2) Ganache //for local blockchain with dummy accounts loaded with ethers for transactions
 3) IPFS client //for storing documents in decentralized storage
 4) MetaMask //for connecting the website with blockchain (localhost), for transactions, and for accounts and token management
-5) Remix //for deploying contract on local blockchain
+5) Truffle //for deploying contract on local blockchain
 ## Software Requirements
 1) npm , Node.js
 2) Ganache
 3) IPFS desktop client
-4) MetaMask Chrome Extension
-5) Remix 
+4) MetaMask Chrome Extension 
 ## Installation
 > step 1. Clone the repository to your local machine:
 ```
-git clone https://github.com/ykstech/Digital-Document-Verification-using-Blockchain-and-IPFS.git
+git clone https://github.com/ykstech/Digital-Document-Verification-using-Blockchain.git
 ```
 >step 2. Navigate to repository:
 ```
-cd Digital-Document-Verification-using-Blockchain-and-IPFS
+cd Digital-Document-Verification-using-Blockchain
 ```
 >step 3. Navigate to frontend folder
 ```
-cd frontend
+cd main/frontend
 ```
 >step 4 Install dependencies for frontend
 ```
-Digital-Document-Verification-using-Blockchain-and-IPFS>frontend>npm install
+Digital-Document-Verification-using-Blockchain>main>frontend>npm install
 ```
 >step 5 Navigate to backend:
 ```
@@ -66,7 +65,7 @@ cd backend
 ```
 >step 6 Install dependencies for backend
 ```
-Digital-Document-Verification-using-Blockchain-and-IPFS>backend>npm install
+Digital-Document-Verification-using-Blockchain-and-IPFS>main>backend>npm install
 ```
 
 ## File structure Tree
@@ -74,18 +73,25 @@ Digital-Document-Verification-using-Blockchain-and-IPFS>backend>npm install
 Digital-Document-Verification-using-Blockchain
 |── main //main project folder
       ├── frontend  //frontend
-      │        ├── src
-      │        │     └── pages
-      │        │           ├── HomePage.js  //landing page
-      │        │           ├── OwnerPage.js  
-      │        │           ├── StudentPage.js
-      │        │           ├── UniversityPage.js
-      │        │           ├── CompanyPage.js
-      │        │           ├── MetaMaskInfo.js  //connection with SC and metamask
-      │        │           └── ContractInfo.js  //contract address and abi// automatically generated
+      │    └── src
+      │        ├── pages
+      │        │      ├── HomePage.js  
+      │        │      ├── OwnerPage.js  
+      │        │      ├── StudentPage.js
+      │        │      ├── UniversityPage.js
+      │        │      ├── CompanyPage.js
+      │        │      └── AuthPage.js 
+      │        │           
       │        └── App.js //main file
       │          
       ├── backend   //backend
+      │       ├──IpfsDb
+      │       │     ├── ipfsConnect.js
+      │       │     └── ipfsfn.js
+      │       │
+      │       ├──MongoDb
+      │       │     ├── mongoConnect.js
+      │       │     └── mongofn.js
       │       └── server.js 
       └── SmartContract  //smartcontract
               ├── contract
@@ -123,7 +129,6 @@ BOOM ALL DONE!!
 ## project Interaction
 *Note: The page name should match with the metamask account name.
 for ex. When the student page is open, the student account is set in metamask and its address is shown on screen\
-// now its not the correct time to explain the functionalities because UI/CSS is not completed , but if you want to try you can use it , all functions are working 
 
       
 

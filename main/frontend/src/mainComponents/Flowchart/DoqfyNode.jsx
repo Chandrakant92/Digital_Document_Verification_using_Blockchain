@@ -3,8 +3,8 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { Handle, Position, applyNodeChanges, useNodes, useNodesState, useReactFlow, useStoreApi } from 'reactflow';
 import CryptoJS from 'crypto-js';
 
-const handleStyle1 = { top: 40 };
-const handleStyle2 = { top: 60 };
+const handleStyle1 = { top: 50 };
+const handleStyle2 = { top: 65 };
 
 const DoqfyNode = memo(({ data, isConnectable }) => {
     const cardbg = useColorModeValue('#ffffff', 'navy.800');
@@ -12,8 +12,8 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
     const uploadColor = useColorModeValue("brand.500", "white");
     const textColor = useColorModeValue("secondaryGray.900", "white");
 
-    const [message, setMessage] = useState(""); //1
-    
+    const [message, setMessage] = useState("Intermediatary Processor"); //1
+   
 
     const { setNodes } = useReactFlow();
     const store = useStoreApi();
@@ -72,7 +72,7 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
             );
 
             setMessage(`File uploaded to IPFS & Blockchain`);
-
+          
         };
         if (data.document) sendData(data);
     }, [data.document]);
@@ -88,7 +88,7 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
             const check = hash1 === hash2;
             if (!check) {
                 console.log("Invalid or Fraud Document");
-                setMessage("Invalid or Fraud Document")
+                setMessage("Invalid or Fraud Document");
                 return;
             }
            
@@ -103,8 +103,7 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
                     }
                     console.log("verified");
                     setMessage("Document verified Successfully");
-
-
+                  
                     return node;
                 })
             );
@@ -117,7 +116,7 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
 
 
     return (
-        <Box border='1px' borderColor='gray.300' bg={boxBg} backgroundClip="border-box" borderRadius={"10px"}>
+        <Box w="140px" border='1px' borderColor='gray.300' bg={boxBg} backgroundClip="border-box" borderRadius={"10px"}>
             <Text
 
                 color={textColor}
@@ -135,9 +134,9 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
                     fontSize='12px'
                     fontWeight='400'
 
-                    m="2"
+                   
                 >
-                    {message && message}
+                    {message}
                 </Text>
 
             </Stack>
@@ -153,6 +152,27 @@ const DoqfyNode = memo(({ data, isConnectable }) => {
                 position={Position.Left}
                 id="d"
                 style={handleStyle2}
+                isConnectable={isConnectable}
+            />
+             <Handle
+                type="source"
+                position={Position.Right}
+                id="e"
+                style={handleStyle1}
+                isConnectable={isConnectable}
+            />
+            <Handle
+                type="source"
+                position={Position.Right}
+                id="f"
+                style={handleStyle2}
+                isConnectable={isConnectable}
+            />
+            <Handle
+                type="target"
+                position={Position.Bottom}
+                id="j"
+                // style={handleStyle2}
                 isConnectable={isConnectable}
             />
         </Box>

@@ -2,7 +2,7 @@ import { Box, Button, Divider, Input, Stack, Text, useColorModeValue } from '@ch
 import { memo, useCallback, useState } from 'react';
 import { Handle, Position, applyNodeChanges, useNodes, useNodesState, useReactFlow, useStoreApi } from 'reactflow';
 
-const handleStyle1 = {  };
+const handleStyle1 = {};
 
 const StudentNode = memo(({ data, isConnectable }) => {
   const cardbg = useColorModeValue('#ffffff', 'navy.800');
@@ -12,7 +12,7 @@ const StudentNode = memo(({ data, isConnectable }) => {
 
   const [selectedFile, setSelectedFile] = useState();
   const [selectListm, setSelectListm] = useState([]);
-   
+
   const handleFileUpload = (event) => {
 
     const file = event.target.files[0];
@@ -23,38 +23,39 @@ const StudentNode = memo(({ data, isConnectable }) => {
   const { setNodes } = useReactFlow();
   const store = useStoreApi();
   const { nodeInternals } = store.getState();
-  
+
 
   const handleUploadClick = () => {
-    
- console.log("st:",selectedFile.name);
+    if (!selectedFile) return;
+    console.log("st:", selectedFile.name);
     const updatedSelectList = [...selectListm, selectedFile];
-       
-   
- 
- setNodes(
-   Array.from(nodeInternals.values()).map((node) => {
-     if (node.id === "node-2") {
-       node.data = {
-         ...node.data,
-        selectList: updatedSelectList ,
-       };
-     }
-     if (node.id === "node-3") {
-      node.data = {
-        ...node.data,
-       document: selectedFile ,
-      };
-    }
 
-     return node;
-   })
- );
- setSelectListm(updatedSelectList);
+
+
+    setNodes(
+      Array.from(nodeInternals.values()).map((node) => {
+        if (node.id === "node-2") {
+          node.data = {
+            ...node.data,
+            selectList: updatedSelectList,
+          };
+        }
+        if (node.id === "node-3") {
+          node.data = {
+            ...node.data,
+            document: selectedFile,
+          };
+        }
+
+        return node;
+      })
+    );
+    setSelectListm(updatedSelectList);
+    setSelectedFile();
   };
 
   return (
-    <Box border='1px' borderColor='gray.300' bg={boxBg} backgroundClip="border-box" borderRadius={"10px"}>
+    <Box w="140px" border='1px' borderColor='gray.300' bg={boxBg} backgroundClip="border-box" borderRadius={"10px"}>
       <Text
 
         color={textColor}
@@ -74,11 +75,21 @@ const StudentNode = memo(({ data, isConnectable }) => {
           id="file-input"
         />
         <label htmlFor="file-input">
-          <Button as="span" variant="outline" size="xs" w="90px" >
+          <Button as="span" variant="outline" size="xs" w="100%" >
             Choose file
           </Button>
         </label>
-        <Button onClick={handleUploadClick} variant="brand" size="xs" w="90px">Upload</Button>
+        <Text
+
+          color={textColor}
+          fontSize='12px'
+          fontWeight='400'
+          lineHeight='100%'
+          align="center"
+        >
+          {selectedFile && selectedFile.name}
+        </Text>
+        <Button onClick={handleUploadClick} variant="brand" size="xs" >Upload</Button>
       </Stack>
       <Handle
         type="source"
@@ -87,7 +98,7 @@ const StudentNode = memo(({ data, isConnectable }) => {
         style={handleStyle1}
         isConnectable={isConnectable}
       />
-      </Box>
+    </Box>
   );
 })
 

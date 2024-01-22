@@ -12,17 +12,19 @@ const UniversityNode = memo(({ data, isConnectable }) => {
 
     const [selectedDocument, setSelectedDocument] = useState(); //1
     const [selectedFile, setSelectedFile] = useState(); //2
-
+    const [selectIndex, setSelectIndex] = useState(-1);
 
     const { setNodes } = useReactFlow();
     const store = useStoreApi();
     const { nodeInternals } = store.getState();
 
     const handleSelectChange = (event) => {
-        
-        const selectedFile = event.target.value;
-        setSelectedDocument(data.selectList[selectedFile]); //1
-        
+
+        const index = event.target.value;
+        if (index == -1) return;
+        setSelectedDocument(data.selectList[index]); //1
+        setSelectIndex(index);
+
     }
 
     const handleFileUpload = (event) => {
@@ -35,8 +37,8 @@ const UniversityNode = memo(({ data, isConnectable }) => {
 
 
     const handleUploadClick = () => {
-        if(!selectedDocument || !selectedFile)return;
-        console.log("d3",selectedDocument.name," od",selectedFile.name);
+        if (!selectedDocument || !selectedFile) return;
+        console.log("d3", selectedDocument.name, " od", selectedFile.name);
         setNodes(
             Array.from(nodeInternals.values()).map((node) => {
 
@@ -50,15 +52,13 @@ const UniversityNode = memo(({ data, isConnectable }) => {
                 return node;
             })
         );
-        setSelectedDocument();
-        setSelectedFile();
 
     };
 
 
 
     return (
-        <Box border='1px' borderColor='gray.300' bg={boxBg} backgroundClip="border-box" borderRadius={"10px"}>
+        <Box  w="140px" border='1px' borderColor='gray.300' bg={boxBg} backgroundClip="border-box" borderRadius={"10px"}>
             <Text
 
                 color={textColor}
@@ -71,9 +71,9 @@ const UniversityNode = memo(({ data, isConnectable }) => {
             </Text>
             <Divider />
             <Stack p="4">
-                <Select size="xs" w="90px" variant='auth' label="Select Document" onChange={handleSelectChange} 
-                   >
-                    <option value="">Select Document</option>
+                <Select size="xs"  variant='auth' label="Select Document" onChange={handleSelectChange}
+                    value={selectIndex}  >
+                    <option value={-1}>Select Document</option>
                     {data.selectList && data.selectList.map((file, index) => (
                         <option key={index} value={index}>
                             {file.name}
@@ -87,11 +87,21 @@ const UniversityNode = memo(({ data, isConnectable }) => {
                     id="file-input2"
                 />
                 <label htmlFor="file-input2">
-                    <Button as="span" variant="outline" size="xs" w="90px" >
-                        Choose file
+                    <Button w="100%" as="span" variant="outline" size="xs"  >
+                        Choose file 
                     </Button>
                 </label>
-                <Button onClick={handleUploadClick} variant="brand" size="xs" w="90px">Upload</Button>
+                <Text
+
+                    color={textColor}
+                    fontSize='12px'
+                    fontWeight='400'
+                    lineHeight='100%'
+                  align="center"
+                >
+                    {selectedFile && selectedFile.name}
+                </Text>
+                <Button onClick={handleUploadClick} variant="brand" size="xs" >Verify</Button>
             </Stack>
             <Handle
                 type="source"

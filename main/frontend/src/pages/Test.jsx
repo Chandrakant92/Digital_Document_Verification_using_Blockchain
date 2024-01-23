@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { exportComponentAsPNG } from 'react-component-export-image';
-import { Box, Button, Flex, Image, Input, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Image, Input, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 
 const Test = () => {
   const [name, setName] = useState('Yash Sugandhi');
@@ -11,7 +11,8 @@ const Test = () => {
   
   const [organization, setOrganization] = useState('SSGMCE');
   const certificateRef = useRef(null);
-
+  const cardbg = useColorModeValue('#ffffff', 'navy.800');
+  
 
 
   const handleExport = () => {
@@ -19,11 +20,11 @@ const Test = () => {
   };
 
   return (
-    <Flex >
+    <Flex bg={cardbg}  borderRadius='20px'>
 
 
       {/* User Input Fields */}
-      <Box p='5' bg='white' borderRadius='20px' >
+      <Box   m="7">
         <Stack spacing={'5'}>
           <label>Name:</label>
           <Input variant={'auth'}
@@ -64,21 +65,21 @@ const Test = () => {
       src='./images/c1.png'
       alt='Certificate Background'
       width='800px' height="700px"
-      style={{display: "block"}}
+      style={{display: "block",marginTop:"-120px"}}
     />
  
-  <Box  position={"absolute"}  top={230} left={0} m="100">
-    <Text align="center" fontSize='22px' fontWeight='400' lineHeight='100%' m="2">
+  <Box  position={"absolute"}  top={100} left={0} m="100">
+    <Text color="black" align="center" fontSize='22px' fontWeight='400' lineHeight='100%' m="2">
       {name}
     </Text>
-    <Text align="center" fontSize='16px' fontWeight='400' lineHeight='100%' m="3">
+    <Text color="black" align="center" fontSize='16px' fontWeight='400' lineHeight='100%' m="3">
    <br/>
     {about}
     </Text>
-    <Text align="center"  fontSize='16px' fontWeight='600' lineHeight='100%' m="2">
+    <Text color="black" align="center"  fontSize='16px' fontWeight='600' lineHeight='100%' m="2">
       {event}
     </Text>
-    <Text align="center" fontSize='22px' fontWeight='400' lineHeight='100%' m="2">
+    <Text color="black" align="center" fontSize='22px' fontWeight='400' lineHeight='100%' m="2">
       <br/><br/><br/>
       {organization}
     </Text>

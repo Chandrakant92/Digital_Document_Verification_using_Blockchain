@@ -26,8 +26,8 @@ To address the issue of the distribution and verification of certificates, we pr
    - verify the company
 ## Workflow
 - when student upload the document, it is pining on IPFS and its CID (hash) is stored in the blockchain as <br> mapping{documentID->student_address,hash,university_address,verifiedStatus}.
-- Then the university selects the document ID to be verified or sees the document uploaded by the student. To verify this document, they have to submit the original document issued by the university for verification. If both documents are the same, then the ipfs will return the same hash; otherwise, a new hash is returned, which is checked in the blockchain. If it is found to be the same, then verification status is changed to verified; otherwise, it remains unverified. \
-and after verification A QR code is embedded in a document with a document ID for verification.
+- Then the university selects the document ID to be verified. To verify this document, they have to upload the original document issued by the university for verification. If both documents are the same, then the ipfs will return the same hash and in blockchain verification status is upadated to verified: true; and after that QR code is embedded on PDF with documentID. 
+- OR University can directly upload multiple student document with verified status true during generation of result so this removes the posibility of counterfitting of documents completely, they just have to upload excel file with two columns as studentaddress and file name(with extension) and select multiple files. 
 - Company can scan the QR to see the verification status and document. \
 or they can upload the document submitted by the student, then ifps will return the hash, and blockchain will check if it is the same as the uploaded document hash or not. if it is, then the document is authentic and its verification status is returned; otherwise, the document is Fake (counterfeit)
 ## What we need 
@@ -126,9 +126,19 @@ npm start
 >step 5. Connect the website with MetaMask 
 
 BOOM ALL DONE!!
-## project Interaction
+## Setup 
+step 1. create 3 accounts from Auth Signup page with 3 roles remember to have same wallet address as role. \
+step 2. University: add university (top right) \
+step 3. Company: add company (top right) \
+step 4. Owner: select and verify university and company 
+## Main project Interaction
 *Note: The page name should match with the metamask account name.
-for ex. When the student page is open, the student account is set in metamask and its address is shown on screen\
+for ex. When the student page is open, the student account is set in metamask and its address is shown on screen \
+step 1. Student: upload document \
+step 2. University: select document and upload original document that they have \
+step 3. Company those who are added by student for document can see verification status by scanning QR code \
+or can upload the document submitted by student and check its authenticity. 
+
 
       
 

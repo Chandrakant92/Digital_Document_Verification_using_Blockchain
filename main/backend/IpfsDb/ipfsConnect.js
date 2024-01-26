@@ -17,7 +17,7 @@ async function initIPFSClient() {
         // Check IPFS connection status
         const isOnline = await ipfs.isOnline();
         if (isOnline) {
-            console.log("IPFS client connected successfully");
+            console.log("connected to IPFS");
         } else {
             console.log("IPFS client failed to connect");
             // Handle connection failure here

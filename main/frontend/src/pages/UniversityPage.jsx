@@ -357,7 +357,6 @@ function UniversityPage() {
 
 
 
-  // Define your document upload function
   async function addUniversityfn() {
     try {
       setIpfsData(null);
@@ -370,7 +369,7 @@ function UniversityPage() {
       // Wait for the transaction to be mined and get the transaction hash
       await transaction.wait();
       setTransaction(transaction);
-      console.log('University added successfully:', transaction);
+      console.log('University registered successfully:', transaction);
       toast.success('University registered successfully', {
         icon:FaUniversity,
         onOpen: () => {

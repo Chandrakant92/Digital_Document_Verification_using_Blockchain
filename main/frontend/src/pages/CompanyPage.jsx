@@ -180,9 +180,9 @@ function CompanyPage() {
       // Call the smart contract function
       const transaction = await contract.registerCompany({ from: account });
       await transaction.wait();
-      console.log('Company added successfully:', transaction);
+      console.log('Company registered successfully:', transaction);
 
-      toast.success(`Company added successfully`, {
+      toast.success(`Company registered successfully`, {
         icon: FaBuilding,
         onOpen: () => {
           playToastSound(); // Play the sound when the toast opens

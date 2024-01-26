@@ -45211,12 +45211,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0xE76863Ed5652ae5Cb2997817B7f48691eFd0B0a6",
-      "transactionHash": "0x4e1c7b738caa4784fd9c3e341696da57959cad1afbd4e6a38b945e2a27e2560c"
+      "address": "0x5534FC747a528B4b136234B2733823629171D471",
+      "transactionHash": "0xf546b79f5b2fe3e0e93ce7275c69635bb46673155fa6a5b78a09386caf2427cc"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-01-07T13:41:42.126Z",
+  "updatedAt": "2024-01-26T10:46:46.185Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

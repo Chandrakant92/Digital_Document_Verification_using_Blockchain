@@ -109,11 +109,13 @@ const FileUpload = ({
       </Flex>
 
       {btn1Text &&
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap={{ base: '10%', }} >
+        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} 
+        gap={{ base: '40%', }} 
+        >
 
           <Button
             onClick={handleBtn1}
-            w='140px'
+            // w='140px'
             mt={{ base: "0px", "2xl": "auto" }}
             variant='brand'
             fontWeight='500'>
@@ -122,7 +124,7 @@ const FileUpload = ({
           {btn2Text &&
             <Button
               onClick={handleBtn2}
-              w='140px'
+              // w='140px'
               mt={{ base: "0px", "2xl": "auto" }}
               variant='brand'
               fontWeight='500'>

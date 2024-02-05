@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect,useRef,useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -18,25 +18,62 @@ import routes from "./routes";
 import { SidebarContext } from "./context/SidebarContext";
 import Sidebar from "./components/sidebar/Sidebar";
 import { PageProvider } from "./context/PageContext";
-import { UserProvider, useUserContext } from "./context/UserContext";
-import { useMetaMaskContext } from "./context/MetaMaskContext";
-
-
+import {Howl, Howler} from 'howler';
 function App() {
   const [ fixed ] = useState(false);
 	const [ toggleSidebar, setToggleSidebar ] = useState(false);
 	const { onOpen ,isOpen} = useDisclosure();
-  const {  users,login } = useUserContext();
+ 
+
+  const soundRef = useRef(null);
+
+  useEffect(() => {
+    // Create a new Howl instance only if it doesn't exist
+    if (!soundRef.current) {
+      soundRef.current = new Howl({
+        src: ['./music/bg.m4a'],
+        html5: true,
+        loop: true,
+      });
+    }
+
+    // Start playing the sound
+    soundRef.current.play();
+
+    // Cleanup function to stop playing the sound when the component unmounts
+    return () => {
+      if (soundRef.current) {
+       // soundRef.current.stop();
+      }
+    };
+  }, []); // Empty dependency array ensures the effect runs only once during mount
+
+  
+  
 
   toast.onChange(payload => {
-    if(payload.status === "added" ) {
-     const audio = new Audio('main/frontend/src/assets/toast_sound.mp3');
-     audio.play();
-    //  const audio = new Audio('https://drive.google.com/uc?export=download&id=1M95VOpto1cQ4FQHzNBaLf0WFQglrtWi7');
-    //  audio.play();
-   //  console.log("toast added")
+    if (payload.status === "added") {
+      const audio = new Audio('./music/toast_sound.mp3');
+  
+      const playAudio = () => {
+        audio.play();
+        // Remove the event listener once the audio is ready to play
+        audio.removeEventListener('canplaythrough', playAudio);
+      };
+  
+      // Listen for the 'canplaythrough' event to ensure the audio is ready to play
+      audio.addEventListener('canplaythrough', playAudio);
+  
+      // Handle errors during audio loading
+      audio.addEventListener('error', (error) => {
+        console.error('Error loading audio:', error);
+      });
+  
+      // Start loading the audio
+      audio.load();
     }
-  })
+  });
+  
  
   
 
@@ -47,7 +84,8 @@ function App() {
       <PageProvider>
       
         <ToastContainer position="bottom-right"/>
-    <Box>
+       
+           <Box>
       
       <SidebarContext.Provider
         value={{

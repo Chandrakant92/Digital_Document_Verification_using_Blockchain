@@ -1,5 +1,5 @@
 const playToastSound = () => {
-       const audio = new Audio('../assets/toast_sound.mp3');
+       const audio = new Audio('./music/toast_sound.mp3');
      audio.play();
   };
   
